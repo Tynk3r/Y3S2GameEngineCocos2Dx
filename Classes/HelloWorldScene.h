@@ -36,8 +36,8 @@ public:
     virtual bool init();
     
 	//Keyboard Event
-	std::vector<cocos2d::EventKeyboard::KeyCode> keysHeld;
-	void onKeyHold(float interval);
+	//std::vector<cocos2d::EventKeyboard::KeyCode> keysHeld;
+	void Update(float interval);
 	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 

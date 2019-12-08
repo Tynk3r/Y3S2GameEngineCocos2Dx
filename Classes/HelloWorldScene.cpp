@@ -24,6 +24,7 @@
 
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
+#include "Input/InputManager.h"
 
 USING_NS_CC;
 
@@ -103,16 +104,6 @@ bool HelloWorld::init()
 	spritebatch->addChild(Sprite1);
 	addChild(spritebatch);
 
-	//Load Animation from Spritesheet
-	//Vector<SpriteFrame*> animFrames(3);
-	//char str[100] = { 0 };
-	//for (int i = 1; i < 3; i++)
-	//{
-	//	sprintf(str, "Blue_Back%d.png", i);
-	//	SpriteFrame* frame = cache->getSpriteFrameByName(str);
-	//	animFrames.pushBack(frame);
-	//}
-
 	//Load idle animation frames
 	Vector<SpriteFrame*> animFrames;
 	animFrames.reserve(4);
@@ -132,12 +123,14 @@ bool HelloWorld::init()
 	this->addChild(spriteNode, 1);
 	this->addChild(nodeItems, 1);
 
-	//Move the sprite
-	//auto moveEvent = MoveBy::create(5, Vec2(200, 0));
-	//auto delay = DelayTime::create(5.0f);
-	//auto delaySequence = Sequence::create(delay, delay->clone(), nullptr);
-	//auto sequence = Sequence::create(moveEvent, delaySequence, moveEvent->reverse(), moveEvent, nullptr);
-	//mainSprite->runAction(sequence);
+	//Creating Inputs
+	InputAction* moveLeft = new InputAction();
+	moveLeft->SetName("Move Left");
+	moveLeft->AddBinding(EventKeyboard::KeyCode::KEY_A);
+
+	InputAction* moveRight = new InputAction();
+	moveRight->SetName("Move Right");
+	moveRight->AddBinding(EventKeyboard::KeyCode::KEY_D);
 
 	//Keyboard Event
 	auto listener = EventListenerKeyboard::create();
@@ -151,7 +144,7 @@ bool HelloWorld::init()
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerMouse, this);
 
 	//Update
-	this->schedule(schedule_selector(HelloWorld::onKeyHold));
+	this->schedule(schedule_selector(HelloWorld::Update));
 
     
     return true;
@@ -173,15 +166,17 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 
 void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 {
-	if (std::find(keysHeld.begin(), keysHeld.end(), keyCode) == keysHeld.end()) 
-	{
-		keysHeld.push_back(keyCode);
-	}
+	//if (std::find(keysHeld.begin(), keysHeld.end(), keyCode) == keysHeld.end()) 
+	//{
+	//	keysHeld.push_back(keyCode);
+	//}
+	InputManager::GetInstance()->UpdatePressed(keyCode);
 }
 
 void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
 {
-	keysHeld.erase(std::remove(keysHeld.begin(), keysHeld.end(), keyCode), keysHeld.end());
+	//keysHeld.erase(std::remove(keysHeld.begin(), keysHeld.end(), keyCode), keysHeld.end());
+	InputManager::GetInstance()->UpdateReleased(keyCode);
 }
 
 void HelloWorld::onMouseDown(EventMouse* e)
@@ -211,44 +206,86 @@ void HelloWorld::onMouseUp(EventMouse* e)
 	currSprite->runAction(RepeatForever::create(animateMove));
 }
 
-void HelloWorld::onKeyHold(float interval)
+void HelloWorld::Update(float interval)
 {
-	if (std::find(keysHeld.begin(), keysHeld.end(), EventKeyboard::KeyCode::KEY_RIGHT_ARROW) != keysHeld.end())
-	{
-		auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
-		//auto moveEvent = MoveBy::create(0.0f, Vec2(1.0f, 0.f));
-		//curSprite->runAction(moveEvent);
+	//if (std::find(keysHeld.begin(), keysHeld.end(), EventKeyboard::KeyCode::KEY_RIGHT_ARROW) != keysHeld.end())
+	//{
+	//	auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
+	//	//auto moveEvent = MoveBy::create(0.0f, Vec2(1.0f, 0.f));
+	//	//curSprite->runAction(moveEvent);
+	//
+	//	//Physics movement
+	//	PhysicsBody* curPhysics = curSprite->getPhysicsBody();
+	//	curPhysics->setVelocity(Vec2(100.0f, curPhysics->getVelocity().y));
+	//
+	//	//auto animationCache = AnimationCache::getInstance();
+	//	//animationCache->addAnimationsWithFile("sprite_ani.plist");
+	//	//auto animation = animationCache->animationByName("walk_right");	//	//auto animate = Animate::create(animation);
+	//	//curSprite->runAction(animate);
+	//}
+	//else if (std::find(keysHeld.begin(), keysHeld.end(), EventKeyboard::KeyCode::KEY_LEFT_ARROW) != keysHeld.end())
+	//{
+	//	auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
+	//	//auto moveEvent = MoveBy::create(0.0f, Vec2(-1.0f, 0.f));
+	//	//curSprite->runAction(moveEvent);
+	//
+	//	//Physics movement
+	//	PhysicsBody* curPhysics = curSprite->getPhysicsBody();
+	//	curPhysics->setVelocity(Vec2(-100.0f, curPhysics->getVelocity().y));
+	//
+	//	//auto animationCache = AnimationCache::getInstance();
+	//	//animationCache->addAnimationsWithFile("sprite_ani.plist");
+	//	//auto animation = animationCache->animationByName("walk_left");	//	//auto animate = Animate::create(animation);
+	//	//curSprite->runAction(animate);
+	//}
+	//else
+	//{
+	//	auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
+	//
+	//	//Physics movement
+	//	PhysicsBody* curPhysics = curSprite->getPhysicsBody();
+	//	curPhysics->setVelocity(Vec2(0.0f, curPhysics->getVelocity().y));
+	//}
 
-		//Physics movement
-		PhysicsBody* curPhysics = curSprite->getPhysicsBody();
-		curPhysics->setVelocity(Vec2(100.0f, curPhysics->getVelocity().y));
+	InputManager::GetInstance()->Update();
 
-		//auto animationCache = AnimationCache::getInstance();
-		//animationCache->addAnimationsWithFile("sprite_ani.plist");
-		//auto animation = animationCache->animationByName("walk_right");		//auto animate = Animate::create(animation);
-		//curSprite->runAction(animate);
-	}
-	else if (std::find(keysHeld.begin(), keysHeld.end(), EventKeyboard::KeyCode::KEY_LEFT_ARROW) != keysHeld.end())
+	if (InputManager::GetInstance()->GetAction("Move Left")->Held())
 	{
 		auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
 		//auto moveEvent = MoveBy::create(0.0f, Vec2(-1.0f, 0.f));
 		//curSprite->runAction(moveEvent);
-
+		
 		//Physics movement
 		PhysicsBody* curPhysics = curSprite->getPhysicsBody();
 		curPhysics->setVelocity(Vec2(-100.0f, curPhysics->getVelocity().y));
-
+		
 		//auto animationCache = AnimationCache::getInstance();
 		//animationCache->addAnimationsWithFile("sprite_ani.plist");
 		//auto animation = animationCache->animationByName("walk_left");		//auto animate = Animate::create(animation);
 		//curSprite->runAction(animate);
 	}
+	else if (InputManager::GetInstance()->GetAction("Move Right")->Held())
+	{
+		auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
+		//auto moveEvent = MoveBy::create(0.0f, Vec2(1.0f, 0.f));
+		//curSprite->runAction(moveEvent);
+		
+		//Physics movement
+		PhysicsBody* curPhysics = curSprite->getPhysicsBody();
+		curPhysics->setVelocity(Vec2(100.0f, curPhysics->getVelocity().y));
+		
+		//auto animationCache = AnimationCache::getInstance();
+		//animationCache->addAnimationsWithFile("sprite_ani.plist");
+		//auto animation = animationCache->animationByName("walk_right");		//auto animate = Animate::create(animation);
+		//curSprite->runAction(animate);
+	}
 	else
 	{
 		auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
-
+	
 		//Physics movement
 		PhysicsBody* curPhysics = curSprite->getPhysicsBody();
 		curPhysics->setVelocity(Vec2(0.0f, curPhysics->getVelocity().y));
 	}
+
 }
