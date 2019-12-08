@@ -127,10 +127,12 @@ bool HelloWorld::init()
 	InputAction* moveLeft = new InputAction();
 	moveLeft->SetName("Move Left");
 	moveLeft->AddBinding(EventKeyboard::KeyCode::KEY_A);
+	moveLeft->AddBinding(EventKeyboard::KeyCode::KEY_LEFT_ARROW);
 
 	InputAction* moveRight = new InputAction();
 	moveRight->SetName("Move Right");
 	moveRight->AddBinding(EventKeyboard::KeyCode::KEY_D);
+	moveRight->AddBinding(EventKeyboard::KeyCode::KEY_RIGHT_ARROW);
 
 	//Keyboard Event
 	auto listener = EventListenerKeyboard::create();
@@ -208,45 +210,6 @@ void HelloWorld::onMouseUp(EventMouse* e)
 
 void HelloWorld::Update(float interval)
 {
-	//if (std::find(keysHeld.begin(), keysHeld.end(), EventKeyboard::KeyCode::KEY_RIGHT_ARROW) != keysHeld.end())
-	//{
-	//	auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
-	//	//auto moveEvent = MoveBy::create(0.0f, Vec2(1.0f, 0.f));
-	//	//curSprite->runAction(moveEvent);
-	//
-	//	//Physics movement
-	//	PhysicsBody* curPhysics = curSprite->getPhysicsBody();
-	//	curPhysics->setVelocity(Vec2(100.0f, curPhysics->getVelocity().y));
-	//
-	//	//auto animationCache = AnimationCache::getInstance();
-	//	//animationCache->addAnimationsWithFile("sprite_ani.plist");
-	//	//auto animation = animationCache->animationByName("walk_right");	//	//auto animate = Animate::create(animation);
-	//	//curSprite->runAction(animate);
-	//}
-	//else if (std::find(keysHeld.begin(), keysHeld.end(), EventKeyboard::KeyCode::KEY_LEFT_ARROW) != keysHeld.end())
-	//{
-	//	auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
-	//	//auto moveEvent = MoveBy::create(0.0f, Vec2(-1.0f, 0.f));
-	//	//curSprite->runAction(moveEvent);
-	//
-	//	//Physics movement
-	//	PhysicsBody* curPhysics = curSprite->getPhysicsBody();
-	//	curPhysics->setVelocity(Vec2(-100.0f, curPhysics->getVelocity().y));
-	//
-	//	//auto animationCache = AnimationCache::getInstance();
-	//	//animationCache->addAnimationsWithFile("sprite_ani.plist");
-	//	//auto animation = animationCache->animationByName("walk_left");	//	//auto animate = Animate::create(animation);
-	//	//curSprite->runAction(animate);
-	//}
-	//else
-	//{
-	//	auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
-	//
-	//	//Physics movement
-	//	PhysicsBody* curPhysics = curSprite->getPhysicsBody();
-	//	curPhysics->setVelocity(Vec2(0.0f, curPhysics->getVelocity().y));
-	//}
-
 	InputManager::GetInstance()->Update();
 
 	if (InputManager::GetInstance()->GetAction("Move Left")->Held())
