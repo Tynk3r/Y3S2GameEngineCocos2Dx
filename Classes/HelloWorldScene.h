@@ -30,6 +30,10 @@
 
 class HelloWorld : public cocos2d::Scene
 {
+private:
+	GLProgram* proPostProcess;
+	RenderTexture* rendtex;
+	Sprite* rendtexSprite;
 public:
     static cocos2d::Scene* createScene();
 

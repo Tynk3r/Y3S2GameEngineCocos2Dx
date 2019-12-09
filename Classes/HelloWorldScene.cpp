@@ -1,18 +1,18 @@
 /****************************************************************************
  Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
- 
+
  http://www.cocos2d-x.org
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,30 +30,30 @@ USING_NS_CC;
 
 Scene* HelloWorld::createScene()
 {
-    return HelloWorld::create();
+	return HelloWorld::create();
 }
 
 // Print useful error message instead of segfaulting when files are not there.
 static void problemLoading(const char* filename)
 {
-    printf("Error while loading: %s\n", filename);
-    printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
+	printf("Error while loading: %s\n", filename);
+	printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
 }
 
 // on "init" you need to initialize your instance
 bool HelloWorld::init()
 {
-    //////////////////////////////
-    // 1. super init first
-    if ( !Scene::initWithPhysics() )
-    {
-        return false;
-    }
+	//////////////////////////////
+	// 1. super init first
+	if (!Scene::initWithPhysics())
+	{
+		return false;
+	}
 
 	this->getPhysicsWorld()->setDebugDrawMask(0xffff);
 
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	Size playingSize = Size(visibleSize.width, visibleSize.height - (visibleSize.height / 8));
 
@@ -123,6 +123,46 @@ bool HelloWorld::init()
 	this->addChild(spriteNode, 1);
 	this->addChild(nodeItems, 1);
 
+	// Shaders
+	/*Vec2 mLoc, mLocInc;
+	mLoc.set(.5f, .5f);
+	mLocInc.set(.005f, .01f);
+	auto shaderCharEffect = new GLProgram();
+	shaderCharEffect->initWithFilenames("Basic.vsh", "CharEffect.fsh");
+	shaderCharEffect->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_POSITION, GLProgram::VERTEX_ATTRIB_POSITION);
+	shaderCharEffect->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_COLOR, GLProgram::VERTEX_ATTRIB_COLOR);
+	shaderCharEffect->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_TEX_COORD, GLProgram::VERTEX_ATTRIB_TEX_COORDS);
+	shaderCharEffect->link();
+	shaderCharEffect->updateUniforms();
+	GLProgramState* state = GLProgramState::getOrCreateWithGLProgram(shaderCharEffect);
+
+	mainSprite->setGLProgram(shaderCharEffect);
+	mainSprite->setGLProgramState(state);
+	state->setUniformVec2("loc", mLoc);*/
+	proPostProcess = GLProgram::createWithFilenames("Basic.vsh", "GreyScale.fsh");
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_COLOR, GLProgram::VERTEX_ATTRIB_POSITION);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_POSITION, GLProgram::VERTEX_ATTRIB_COLOR);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_TEX_COORD, GLProgram::VERTEX_ATTRIB_TEX_COORD);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_TEX_COORD1, GLProgram::VERTEX_ATTRIB_TEX_COORD1);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_TEX_COORD2, GLProgram::VERTEX_ATTRIB_TEX_COORD2);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_TEX_COORD3, GLProgram::VERTEX_ATTRIB_TEX_COORD3);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_NORMAL, GLProgram::VERTEX_ATTRIB_NORMAL);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_BLEND_WEIGHT, GLProgram::VERTEX_ATTRIB_BLEND_WEIGHT);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_BLEND_INDEX, GLProgram::VERTEX_ATTRIB_BLEND_INDEX);
+	proPostProcess->link();
+	proPostProcess->updateUniforms();
+
+	rendtex = RenderTexture::create(visibleSize.width, visibleSize.height);
+	rendtex->retain();
+
+	rendtexSprite = Sprite::createWithTexture(rendtex->getSprite()->getTexture());
+	rendtexSprite->setTextureRect(Rect(0, 0, rendtexSprite->getTexture()->getContentSize().width, rendtexSprite->getTexture()->getContentSize().height));
+	rendtexSprite->setAnchorPoint(Point::ZERO);
+	rendtexSprite->setPosition(Point::ZERO);
+	rendtexSprite->setFlippedY(true);
+	rendtexSprite->setGLProgram(proPostProcess);
+	this->addChild(rendtexSprite);
+
 	//Creating Inputs
 	InputAction* moveLeft = new InputAction();
 	moveLeft->SetName("Move Left");
@@ -148,20 +188,20 @@ bool HelloWorld::init()
 	//Update
 	this->schedule(schedule_selector(HelloWorld::Update));
 
-    
-    return true;
+
+	return true;
 }
 
 
 void HelloWorld::menuCloseCallback(Ref* pSender)
 {
-    //Close the cocos2d-x game scene and quit the application
-    Director::getInstance()->end();
+	//Close the cocos2d-x game scene and quit the application
+	Director::getInstance()->end();
 
-    /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() as given above,instead trigger a custom event created in RootViewController.mm as below*/
+	/*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() as given above,instead trigger a custom event created in RootViewController.mm as below*/
 
-    //EventCustom customEndEvent("game_scene_close_event");
-    //_eventDispatcher->dispatchEvent(&customEndEvent);
+	//EventCustom customEndEvent("game_scene_close_event");
+	//_eventDispatcher->dispatchEvent(&customEndEvent);
 
 
 }
@@ -188,7 +228,7 @@ void HelloWorld::onMouseDown(EventMouse* e)
 void HelloWorld::onMouseUp(EventMouse* e)
 {
 	auto currSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
-	auto moveEvent = MoveTo::create(Vec2(e->getCursorX(), e->getCursorY()).getDistance(currSprite->getPosition())/100.0f, Vec2(e->getCursorX(), e->getCursorY()));
+	auto moveEvent = MoveTo::create(Vec2(e->getCursorX(), e->getCursorY()).getDistance(currSprite->getPosition()) / 100.0f, Vec2(e->getCursorX(), e->getCursorY()));
 	currSprite->stopAllActions();
 	currSprite->runAction(moveEvent);
 
@@ -210,6 +250,12 @@ void HelloWorld::onMouseUp(EventMouse* e)
 
 void HelloWorld::Update(float interval)
 {
+	rendtex->beginWithClear(.0f, .0f, .0f, .0f);
+	this->visit();
+	rendtex->end();
+	rendtexSprite->setTexture(rendtex->getSprite()->getTexture());
+	rendtexSprite->setGLProgram(proPostProcess);
+
 	InputManager::GetInstance()->Update();
 
 	if (InputManager::GetInstance()->GetAction("Move Left")->Held())
@@ -217,11 +263,11 @@ void HelloWorld::Update(float interval)
 		auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
 		//auto moveEvent = MoveBy::create(0.0f, Vec2(-1.0f, 0.f));
 		//curSprite->runAction(moveEvent);
-		
+
 		//Physics movement
 		PhysicsBody* curPhysics = curSprite->getPhysicsBody();
 		curPhysics->setVelocity(Vec2(-100.0f, curPhysics->getVelocity().y));
-		
+
 		//auto animationCache = AnimationCache::getInstance();
 		//animationCache->addAnimationsWithFile("sprite_ani.plist");
 		//auto animation = animationCache->animationByName("walk_left");		//auto animate = Animate::create(animation);
@@ -232,11 +278,11 @@ void HelloWorld::Update(float interval)
 		auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
 		//auto moveEvent = MoveBy::create(0.0f, Vec2(1.0f, 0.f));
 		//curSprite->runAction(moveEvent);
-		
+
 		//Physics movement
 		PhysicsBody* curPhysics = curSprite->getPhysicsBody();
 		curPhysics->setVelocity(Vec2(100.0f, curPhysics->getVelocity().y));
-		
+
 		//auto animationCache = AnimationCache::getInstance();
 		//animationCache->addAnimationsWithFile("sprite_ani.plist");
 		//auto animation = animationCache->animationByName("walk_right");		//auto animate = Animate::create(animation);
@@ -245,7 +291,7 @@ void HelloWorld::Update(float interval)
 	else
 	{
 		auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
-	
+
 		//Physics movement
 		PhysicsBody* curPhysics = curSprite->getPhysicsBody();
 		curPhysics->setVelocity(Vec2(0.0f, curPhysics->getVelocity().y));
