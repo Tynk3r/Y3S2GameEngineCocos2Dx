@@ -59,6 +59,33 @@ bool HelloWorld::init()
 
 	Size playingSize = Size(visibleSize.width, visibleSize.height - (visibleSize.height / 8));
 
+	// Post Processing
+	proPostProcess = GLProgram::createWithFilenames("Basic.vsh", "CharEffect.fsh");
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_POSITION, GLProgram::VERTEX_ATTRIB_POSITION);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_COLOR, GLProgram::VERTEX_ATTRIB_COLOR);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_TEX_COORD, GLProgram::VERTEX_ATTRIB_TEX_COORD);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_TEX_COORD1, GLProgram::VERTEX_ATTRIB_TEX_COORD1);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_TEX_COORD2, GLProgram::VERTEX_ATTRIB_TEX_COORD2);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_TEX_COORD3, GLProgram::VERTEX_ATTRIB_TEX_COORD3);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_NORMAL, GLProgram::VERTEX_ATTRIB_NORMAL);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_BLEND_WEIGHT, GLProgram::VERTEX_ATTRIB_BLEND_WEIGHT);
+	proPostProcess->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_BLEND_INDEX, GLProgram::VERTEX_ATTRIB_BLEND_INDEX);
+	proPostProcess->link();
+	proPostProcess->updateUniforms();
+	Vec2 mLoc(0.5f, 0.5f);
+	GLProgramState::getOrCreateWithGLProgram(proPostProcess)->setUniformVec2("loc", mLoc);
+	
+	rendtex = RenderTexture::create(visibleSize.width, visibleSize.height);
+	rendtex->retain();
+
+	rendtexSprite = Sprite::createWithTexture(rendtex->getSprite()->getTexture());
+	rendtexSprite->setTextureRect(Rect(0, 0, rendtex->getSprite()->getTexture()->getContentSize().width, rendtex->getSprite()->getTexture()->getContentSize().height));
+	rendtexSprite->setAnchorPoint(Point::ZERO);
+	rendtexSprite->setPosition(Point::ZERO);
+	rendtexSprite->setFlippedY(true);
+	rendtexSprite->setShaderProgram(proPostProcess);
+	this->addChild(rendtexSprite, 2);
+
 	//Init containers
 	auto nodeItems = Node::create();
 	nodeItems->setName("nodeItems");
@@ -105,7 +132,6 @@ bool HelloWorld::init()
 	auto Sprite1 = Sprite::createWithSpriteFrameName("Blue_Back1.png");
 	spritebatch->addChild(Sprite1);
 	addChild(spritebatch);
-
 	//Load idle animation frames
 	Vector<SpriteFrame*> animFrames;
 	animFrames.reserve(4);
@@ -150,11 +176,63 @@ bool HelloWorld::init()
 	playerMovement->AddAction(moveRight);
 	playerMovement->AddAction(mouseMovement);
 
+	InputAction* makeBrighter = new InputAction();
+	makeBrighter->SetName("Make Brighter");
+	makeBrighter->AddBinding(EventKeyboard::KeyCode::KEY_EQUAL);
+
+	InputAction* makeDarker = new InputAction();
+	makeDarker->SetName("Make Darker");
+	makeDarker->AddBinding(EventKeyboard::KeyCode::KEY_MINUS);
+
+	////Keyboard Event
+	//auto listener = EventListenerKeyboard::create();
+	//listener->onKeyPressed = CC_CALLBACK_2(HelloWorld::onKeyPressed, this);
+	//listener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
+	//_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
+	////Mouse Event
+	//auto listenerMouse = EventListenerMouse::create();
+	//listenerMouse->onMouseDown = CC_CALLBACK_1(HelloWorld::onMouseDown, this);
+	//listenerMouse->onMouseDown = CC_CALLBACK_1(HelloWorld::onMouseUp, this);
+	//_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerMouse, this);
+
 	//Update
 	this->schedule(schedule_selector(HelloWorld::Update));
-
     
     return true;
+}
+
+void HelloWorld::graySprite(Sprite* sprite)
+{
+	if (sprite)
+	{
+		GLProgram* p = new GLProgram();
+		p->initWithFilenames("Basic.vsh", "gray.fsh");
+		p->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_POSITION, GLProgram::VERTEX_ATTRIB_POSITION);
+		p->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_COLOR, GLProgram::VERTEX_ATTRIB_COLOR);
+		p->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_TEX_COORD, GLProgram::VERTEX_ATTRIB_TEX_COORDS);
+		p->link();
+		p->updateUniforms();
+		sprite->setShaderProgram(p);
+	}
+}
+
+void HelloWorld::charEffectSprite(Sprite* sprite)
+{
+	if (sprite)
+	{
+		GLProgram* p = new GLProgram();
+		p->initWithFilenames("Basic.vsh", "CharEffect.fsh");
+		p->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_POSITION, GLProgram::VERTEX_ATTRIB_POSITION);
+		p->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_COLOR, GLProgram::VERTEX_ATTRIB_COLOR);
+		p->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_TEX_COORD, GLProgram::VERTEX_ATTRIB_TEX_COORDS);
+		p->link();
+		p->updateUniforms();
+		GLProgramState* state = GLProgramState::getOrCreateWithGLProgram(p);
+		Vec2 mLoc(0.5f, 0.5f);
+		state->setUniformVec2("loc", mLoc);
+		sprite->setShaderProgram(p);
+	}
 }
 
 
@@ -171,14 +249,64 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 
 }
 
+void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
+{
+	//if (std::find(keysHeld.begin(), keysHeld.end(), keyCode) == keysHeld.end()) 
+	//{
+	//	keysHeld.push_back(keyCode);
+	//}
+	InputManager::GetInstance()->UpdatePressed(keyCode);
+}
+
+void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
+{
+	//keysHeld.erase(std::remove(keysHeld.begin(), keysHeld.end(), keyCode), keysHeld.end());
+	InputManager::GetInstance()->UpdateReleased(keyCode);
+}
+
+void HelloWorld::onMouseDown(EventMouse* e)
+{
+}
+
+void HelloWorld::onMouseUp(EventMouse* e)
+{
+	auto currSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
+	auto moveEvent = MoveTo::create(Vec2(e->getCursorX(), e->getCursorY()).getDistance(currSprite->getPosition())/100.0f, Vec2(e->getCursorX(), e->getCursorY()));
+	currSprite->stopAllActions();
+	currSprite->runAction(moveEvent);
+
+	//Animation
+
+	//Load movement animation
+	Vector<SpriteFrame*> animFrames;
+	animFrames.reserve(4);
+	animFrames.pushBack(SpriteFrame::create("Blue_Back2.png", Rect(0, 0, 65, 81)));
+	animFrames.pushBack(SpriteFrame::create("Blue_Back1.png", Rect(0, 0, 65, 81)));
+	animFrames.pushBack(SpriteFrame::create("Blue_Back3.png", Rect(0, 0, 65, 81)));
+	animFrames.pushBack(SpriteFrame::create("Blue_Back1.png", Rect(0, 0, 65, 81)));
+
+	Animation* animation = Animation::createWithSpriteFrames(animFrames, 0.5f);
+	Animate* animateMove = Animate::create(animation);
+
+	currSprite->runAction(RepeatForever::create(animateMove));
+}
+
 void HelloWorld::Update(float interval)
 {
+	InputManager::GetInstance()->Update();
+
+	if (InputManager::GetInstance()->GetAction("Make Brighter")->Held())
+		darkness = clampf(darkness - .1f, 0.f, 10.f);
+	else if(InputManager::GetInstance()->GetAction("Make Darker")->Held())
+		darkness = clampf(darkness + .1f, 0.f, 10.f);
+	GLProgramState::getOrCreateWithGLProgram(proPostProcess)->setUniformFloat("darkness", darkness);
+
 	if (InputManager::GetInstance()->GetAction("Move Left")->Held())
 	{
 		auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
 		//auto moveEvent = MoveBy::create(0.0f, Vec2(-1.0f, 0.f));
 		//curSprite->runAction(moveEvent);
-		
+
 		//Physics movement
 		PhysicsBody* curPhysics = curSprite->getPhysicsBody();
 		curPhysics->setVelocity(Vec2(-100.0f, curPhysics->getVelocity().y));
@@ -188,7 +316,7 @@ void HelloWorld::Update(float interval)
 		auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
 		//auto moveEvent = MoveBy::create(0.0f, Vec2(1.0f, 0.f));
 		//curSprite->runAction(moveEvent);
-		
+
 		//Physics movement
 		PhysicsBody* curPhysics = curSprite->getPhysicsBody();
 		curPhysics->setVelocity(Vec2(100.0f, curPhysics->getVelocity().y));
@@ -218,7 +346,7 @@ void HelloWorld::Update(float interval)
 	else
 	{
 		auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
-	
+
 		//Physics movement
 		PhysicsBody* curPhysics = curSprite->getPhysicsBody();
 		curPhysics->setVelocity(Vec2(0.0f, curPhysics->getVelocity().y));
@@ -244,7 +372,14 @@ void HelloWorld::Update(float interval)
 
 		SceneManager::GetInstance()->ReplaceScene(SceneManagementTestScene::createScene(), tempResources);
 	}
+	auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+	GLProgramState::getOrCreateWithGLProgram(proPostProcess)->setUniformVec2("loc", Vec2(curSprite->getPositionX() / visibleSize.width, curSprite->getPositionY() / visibleSize.height));
 
-	InputManager::GetInstance()->Update();
-
+	// Post Processing
+	rendtex->beginWithClear(.0f, .0f, .0f, .0f);
+	this->visit();
+	rendtex->end();
+	rendtexSprite->setTexture(rendtex->getSprite()->getTexture());
+	rendtexSprite->setShaderProgram(proPostProcess);
 }
