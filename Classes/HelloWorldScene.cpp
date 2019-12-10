@@ -162,6 +162,12 @@ bool HelloWorld::init()
 	moveRight->AddBinding(EventKeyboard::KeyCode::KEY_D);
 	moveRight->AddBinding(EventKeyboard::KeyCode::KEY_RIGHT_ARROW);
 
+	InputAction* makeBrighter = new InputAction("Make Brighter");
+	makeBrighter->AddBinding(EventKeyboard::KeyCode::KEY_EQUAL);
+
+	InputAction* makeDarker = new InputAction("Make Darker");
+	makeDarker->AddBinding(EventKeyboard::KeyCode::KEY_MINUS);
+
 	InputAction* mouseMovement = new InputAction("Mouse Movement");
 	mouseMovement->AddBinding(EventMouse::MouseButton::BUTTON_LEFT);
 
@@ -175,14 +181,6 @@ bool HelloWorld::init()
 	playerMovement->AddAction(moveLeft);
 	playerMovement->AddAction(moveRight);
 	playerMovement->AddAction(mouseMovement);
-
-	InputAction* makeBrighter = new InputAction();
-	makeBrighter->SetName("Make Brighter");
-	makeBrighter->AddBinding(EventKeyboard::KeyCode::KEY_EQUAL);
-
-	InputAction* makeDarker = new InputAction();
-	makeDarker->SetName("Make Darker");
-	makeDarker->AddBinding(EventKeyboard::KeyCode::KEY_MINUS);
 
 	////Keyboard Event
 	//auto listener = EventListenerKeyboard::create();
@@ -247,48 +245,6 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
     //_eventDispatcher->dispatchEvent(&customEndEvent);
 
 
-}
-
-void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
-{
-	//if (std::find(keysHeld.begin(), keysHeld.end(), keyCode) == keysHeld.end()) 
-	//{
-	//	keysHeld.push_back(keyCode);
-	//}
-	InputManager::GetInstance()->UpdatePressed(keyCode);
-}
-
-void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
-{
-	//keysHeld.erase(std::remove(keysHeld.begin(), keysHeld.end(), keyCode), keysHeld.end());
-	InputManager::GetInstance()->UpdateReleased(keyCode);
-}
-
-void HelloWorld::onMouseDown(EventMouse* e)
-{
-}
-
-void HelloWorld::onMouseUp(EventMouse* e)
-{
-	auto currSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
-	auto moveEvent = MoveTo::create(Vec2(e->getCursorX(), e->getCursorY()).getDistance(currSprite->getPosition())/100.0f, Vec2(e->getCursorX(), e->getCursorY()));
-	currSprite->stopAllActions();
-	currSprite->runAction(moveEvent);
-
-	//Animation
-
-	//Load movement animation
-	Vector<SpriteFrame*> animFrames;
-	animFrames.reserve(4);
-	animFrames.pushBack(SpriteFrame::create("Blue_Back2.png", Rect(0, 0, 65, 81)));
-	animFrames.pushBack(SpriteFrame::create("Blue_Back1.png", Rect(0, 0, 65, 81)));
-	animFrames.pushBack(SpriteFrame::create("Blue_Back3.png", Rect(0, 0, 65, 81)));
-	animFrames.pushBack(SpriteFrame::create("Blue_Back1.png", Rect(0, 0, 65, 81)));
-
-	Animation* animation = Animation::createWithSpriteFrames(animFrames, 0.5f);
-	Animate* animateMove = Animate::create(animation);
-
-	currSprite->runAction(RepeatForever::create(animateMove));
 }
 
 void HelloWorld::Update(float interval)

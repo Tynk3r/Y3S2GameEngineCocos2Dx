@@ -36,6 +36,15 @@
     <ClCompile Include="..\Classes\Input\InputAction.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\UI\UI.cpp" />
+    <ClCompile Include="..\Classes\Scene Management\SceneManager.cpp" />
+    <ClCompile Include="..\Classes\Anim\CAnimation.cpp" />
+    <ClCompile Include="..\Classes\Input\InputActionMap.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\SceneManagementTestScene.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -58,6 +67,15 @@
     </ClInclude>
     <ClInclude Include="..\Classes\Input\InputAction.h">
       <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\UI\UI.h" />
+    <ClInclude Include="..\Classes\Scene Management\SceneManager.h" />
+    <ClInclude Include="..\Classes\Anim\CAnimation.h" />
+    <ClInclude Include="..\Classes\Input\InputActionMap.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\SceneManagementTestScene.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -150,21 +150,31 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources\" /D /E /I /F /Y
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Classes\Anim\CAnimation.cpp" />
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\EmptyScene.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
     <ClCompile Include="..\Classes\Input\InputAction.cpp" />
+    <ClCompile Include="..\Classes\Input\InputActionMap.cpp" />
     <ClCompile Include="..\Classes\Input\InputManager.cpp" />
     <ClCompile Include="..\Classes\LoadingScene.cpp" />
+    <ClCompile Include="..\Classes\Scene Management\SceneManager.cpp" />
+    <ClCompile Include="..\Classes\SceneManagementTestScene.cpp" />
+    <ClCompile Include="..\Classes\UI\UI.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Classes\Anim\CAnimation.h" />
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\EmptyScene.h" />
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
     <ClInclude Include="..\Classes\Input\InputAction.h" />
+    <ClInclude Include="..\Classes\Input\InputActionMap.h" />
     <ClInclude Include="..\Classes\Input\InputManager.h" />
     <ClInclude Include="..\Classes\LoadingScene.h" />
+    <ClInclude Include="..\Classes\Scene Management\SceneManager.h" />
+    <ClInclude Include="..\Classes\SceneManagementTestScene.h" />
+    <ClInclude Include="..\Classes\UI\UI.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
