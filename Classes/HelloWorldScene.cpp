@@ -82,6 +82,11 @@ bool HelloWorld::init()
 	}
 
 	//Create sprites
+	auto sprite = Sprite::create("HelloWorld.png");
+	sprite->setAnchorPoint(Point(0.5, 0.5));
+	sprite->setPosition(Point(visibleSize.width / 3, visibleSize.height / 3));
+	spriteNode->addChild(sprite);
+
 	auto mainSprite = Sprite::create("Blue_Front1.png");
 	mainSprite->setAnchorPoint(Vec2(0, 0));
 	mainSprite->setPosition(100, playingSize.height / 2 + spriteWidth + 30);
@@ -123,6 +128,8 @@ bool HelloWorld::init()
 	this->addChild(spriteNode, 1);
 	this->addChild(nodeItems, 1);
 
+	graySprite(sprite);
+
 	//Creating Inputs
 	InputAction* moveLeft = new InputAction();
 	moveLeft->SetName("Move Left");
@@ -138,7 +145,8 @@ bool HelloWorld::init()
 	auto listener = EventListenerKeyboard::create();
 	listener->onKeyPressed = CC_CALLBACK_2(HelloWorld::onKeyPressed, this);
 	listener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
 	//Mouse Event
 	auto listenerMouse = EventListenerMouse::create();
 	listenerMouse->onMouseDown = CC_CALLBACK_1(HelloWorld::onMouseDown, this);
@@ -150,6 +158,21 @@ bool HelloWorld::init()
 
     
     return true;
+}
+
+void HelloWorld::graySprite(Sprite* sprite)
+{
+	if (sprite)
+	{
+		GLProgram* p = new GLProgram();
+		p->initWithFilenames("gray.vsh", "gray.fsh");
+		p->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_POSITION, GLProgram::VERTEX_ATTRIB_POSITION);
+		p->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_COLOR, GLProgram::VERTEX_ATTRIB_COLOR);
+		p->bindAttribLocation(GLProgram::ATTRIBUTE_NAME_TEX_COORD, GLProgram::VERTEX_ATTRIB_TEX_COORDS);
+		p->link();
+		p->updateUniforms();
+		sprite->setShaderProgram(p);
+	}
 }
 
 
@@ -224,7 +247,8 @@ void HelloWorld::Update(float interval)
 		
 		//auto animationCache = AnimationCache::getInstance();
 		//animationCache->addAnimationsWithFile("sprite_ani.plist");
-		//auto animation = animationCache->animationByName("walk_left");		//auto animate = Animate::create(animation);
+		//auto animation = animationCache->animationByName("walk_left");
+		//auto animate = Animate::create(animation);
 		//curSprite->runAction(animate);
 	}
 	else if (InputManager::GetInstance()->GetAction("Move Right")->Held())
@@ -239,7 +263,8 @@ void HelloWorld::Update(float interval)
 		
 		//auto animationCache = AnimationCache::getInstance();
 		//animationCache->addAnimationsWithFile("sprite_ani.plist");
-		//auto animation = animationCache->animationByName("walk_right");		//auto animate = Animate::create(animation);
+		//auto animation = animationCache->animationByName("walk_right");
+		//auto animate = Animate::create(animation);
 		//curSprite->runAction(animate);
 	}
 	else

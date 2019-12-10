@@ -34,6 +34,8 @@ public:
     static cocos2d::Scene* createScene();
 
     virtual bool init();
+
+	void graySprite(cocos2d::Sprite* sprite);
     
 	//Keyboard Event
 	//std::vector<cocos2d::EventKeyboard::KeyCode> keysHeld;
