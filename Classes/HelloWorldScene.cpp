@@ -249,8 +249,6 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 
 void HelloWorld::Update(float interval)
 {
-	InputManager::GetInstance()->Update();
-
 	if (InputManager::GetInstance()->GetAction("Make Brighter")->Held())
 		darkness = clampf(darkness - .1f, 0.f, 10.f);
 	else if(InputManager::GetInstance()->GetAction("Make Darker")->Held())
@@ -338,4 +336,7 @@ void HelloWorld::Update(float interval)
 	rendtex->end();
 	rendtexSprite->setTexture(rendtex->getSprite()->getTexture());
 	rendtexSprite->setShaderProgram(proPostProcess);
+
+	InputManager::GetInstance()->Update();
+
 }
