@@ -25,6 +25,7 @@
 #include "LoadingScene.h"
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
+#include "Scene Management/SceneManager.h"
 
 USING_NS_CC;
 
@@ -66,32 +67,19 @@ bool LoadingScene::init()
 		this->addChild(label, 1);
 	}
 
-	numOfResources = 10;
+	numOfResources = SceneManager::GetInstance()->GetResourcesToLoad().size();
 	curResource = 0;
-	Resources[0] = "big.png";
-	Resources[1] = "big - Copy.png";
-	Resources[2] = "big - Copy (1).png";
-	Resources[3] = "big - Copy (2).png";
-	Resources[4] = "big - Copy (3).png";
-	Resources[5] = "big - Copy (4).png";
-	Resources[6] = "big - Copy (5).png";
-	Resources[7] = "big - Copy (6).png";
-	Resources[8] = "big - Copy (7).png";
-	Resources[9] = "big - Copy (8).png";
 
 	auto director = Director::getInstance();
 	TextureCache* textureCache = director->getTextureCache();
-	textureCache->addImageAsync(Resources[0], CC_CALLBACK_1(LoadingScene::loadingTextureFinished, this));
+	textureCache->addImageAsync(SceneManager::GetInstance()->GetResourcesToLoad()[0], CC_CALLBACK_1(LoadingScene::loadingTextureFinished, this));
     return true;
 }
 
-void LoadingScene::update(float dt)
+void LoadingScene::Update(float interval)
 {
-	//auto scene = LoadingScene::createScene();
-	//auto director = Director::getInstance();
-	//return director->replaceScene(scene);
+	SceneManager::GetInstance()->ReplaceScene(SceneManager::GetInstance()->GetSceneToLoad());
 }
-
 
 void LoadingScene::menuCloseCallback(Ref* pSender)
 {
@@ -116,12 +104,12 @@ void LoadingScene::loadingTextureFinished(Texture2D * texture)
 	if (curResource < numOfResources)
 	{
 		TextureCache* textureCache = director->getTextureCache();
-		textureCache->addImageAsync(Resources[curResource], CC_CALLBACK_1(LoadingScene::loadingTextureFinished, this));
+		textureCache->addImageAsync(SceneManager::GetInstance()->GetResourcesToLoad()[curResource], CC_CALLBACK_1(LoadingScene::loadingTextureFinished, this));
 	}
 	else
 	{
-		auto scene = HelloWorld::createScene();
-		return director->replaceScene(scene);
+		this->schedule(schedule_selector(LoadingScene::Update));
+		return;
 	}
 
 }

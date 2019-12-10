@@ -22,31 +22,28 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#ifndef __LOADINGSCENE_SCENE_H__
-#define __LOADINGSCENE_SCENE_H__
+#ifndef __SCENEMANAGEMENTTESTSCENE_SCENE_H__
+#define __SCENEMANAGEMENTTESTSCENE_SCENE_H__
 
 #include "cocos2d.h"
 #include <vector>
 
-class LoadingScene : public cocos2d::Scene
+class SceneManagementTestScene : public cocos2d::Scene
 {
 public:
-	cocos2d::Label* label;
-	int numOfResources;
-	int curResource;
-
-
     static cocos2d::Scene* createScene();
 
     virtual bool init();
+    
+	//Keyboard Event
+	//std::vector<cocos2d::EventKeyboard::KeyCode> keysHeld;
 	void Update(float interval);
 
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
-	void loadingTextureFinished(cocos2d::Texture2D* texture);
-
+    
     // implement the "static create()" method manually
-    CREATE_FUNC(LoadingScene);
+    CREATE_FUNC(SceneManagementTestScene);
 };
 
-#endif // __LoadingScene_SCENE_H__
+#endif // __SceneManagementTestScene_SCENE_H__

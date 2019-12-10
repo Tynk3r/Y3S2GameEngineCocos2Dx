@@ -22,28 +22,28 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#include "HelloWorldScene.h"
+#include "SceneManagementTestScene.h"
 #include "SimpleAudioEngine.h"
 #include "Input/InputManager.h"
 #include "Scene Management/SceneManager.h"
-#include "SceneManagementTestScene.h"
+#include "HelloWorldScene.h"
 
 USING_NS_CC;
 
-Scene* HelloWorld::createScene()
+Scene* SceneManagementTestScene::createScene()
 {
-    return HelloWorld::create();
+    return SceneManagementTestScene::create();
 }
 
 // Print useful error message instead of segfaulting when files are not there.
 static void problemLoading(const char* filename)
 {
     printf("Error while loading: %s\n", filename);
-    printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
+    printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in SceneManagementTestSceneScene.cpp\n");
 }
 
 // on "init" you need to initialize your instance
-bool HelloWorld::init()
+bool SceneManagementTestScene::init()
 {
     //////////////////////////////
     // 1. super init first
@@ -67,21 +67,6 @@ bool HelloWorld::init()
 
 	//Create static items
 	auto spriteWidth = Sprite::create("ZigzagGrass_Mud_Round.png")->getContentSize().width;
-	int numOfBlocks = ceil(playingSize.width / spriteWidth);
-	for (int i = 0; i < numOfBlocks; i++)
-	{
-		auto sprite = Sprite::create("ZigzagGrass_Mud_Round.png");
-		sprite->setAnchorPoint(Vec2::ZERO);
-		sprite->setPosition(0 + i * spriteWidth, playingSize.height / 2);
-		//sprite->setPosition(0, 0);
-
-		//Create static PhysicsBody
-		auto physicsBody = PhysicsBody::createBox(Size(sprite->getContentSize().width, sprite->getContentSize().height), PhysicsMaterial(0.1f, 1.0f, 0.0f));
-		physicsBody->setDynamic(false);
-		sprite->addComponent(physicsBody);
-
-		nodeItems->addChild(sprite, 0);
-	}
 
 	//Create sprites
 	auto mainSprite = Sprite::create("Blue_Front1.png");
@@ -151,14 +136,14 @@ bool HelloWorld::init()
 	playerMovement->AddAction(mouseMovement);
 
 	//Update
-	this->schedule(schedule_selector(HelloWorld::Update));
+	this->schedule(schedule_selector(SceneManagementTestScene::Update));
 
     
     return true;
 }
 
 
-void HelloWorld::menuCloseCallback(Ref* pSender)
+void SceneManagementTestScene::menuCloseCallback(Ref* pSender)
 {
     //Close the cocos2d-x game scene and quit the application
     Director::getInstance()->end();
@@ -171,7 +156,7 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 
 }
 
-void HelloWorld::Update(float interval)
+void SceneManagementTestScene::Update(float interval)
 {
 	if (InputManager::GetInstance()->GetAction("Move Left")->Held())
 	{
@@ -231,18 +216,7 @@ void HelloWorld::Update(float interval)
 
 	if (InputManager::GetInstance()->GetAction("Change Scene")->Pressed())
 	{
-		std::vector<std::string> tempResources;
-		tempResources.push_back("big.png");
-		tempResources.push_back("big - Copy.png");
-		tempResources.push_back("big - Copy (2).png");
-		tempResources.push_back("big - Copy (3).png");
-		tempResources.push_back("big - Copy (4).png");
-		tempResources.push_back("big - Copy (5).png");
-		tempResources.push_back("big - Copy (6).png");
-		tempResources.push_back("big - Copy (7).png");
-		tempResources.push_back("big - Copy (8).png");
-
-		SceneManager::GetInstance()->ReplaceScene(SceneManagementTestScene::createScene(), tempResources);
+		SceneManager::GetInstance()->ReplaceScene(HelloWorld::createScene());
 	}
 
 	InputManager::GetInstance()->Update();
