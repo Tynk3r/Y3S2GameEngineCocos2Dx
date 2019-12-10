@@ -27,6 +27,7 @@
 #include "Input/InputManager.h"
 #include "Scene Management/SceneManager.h"
 #include "SceneManagementTestScene.h"
+#include "Anim/CAnimation.h"
 
 USING_NS_CC;
 
@@ -181,6 +182,11 @@ bool HelloWorld::init()
 	playerMovement->AddAction(moveLeft);
 	playerMovement->AddAction(moveRight);
 	playerMovement->AddAction(mouseMovement);
+
+
+	//Sounds
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	audio->playBackgroundMusic("BackgroundMusic.wav", true);	//For sound effects(“name of file”,loop, pitch, stereo, gain)	//audio->playEffect("Explosion.wav", false, 1.0f, 0.0f, 1.0f);
 
 	////Keyboard Event
 	//auto listener = EventListenerKeyboard::create();
