@@ -6,6 +6,16 @@ InputManager::InputManager()
 
 InputManager::~InputManager()
 {
+	for (int i = 0; i < actions.size(); i++)
+	{
+		delete actions[i];
+		actions[i] = nullptr;
+	}
+	for (int i = 0; i < actionMaps.size(); i++)
+	{
+		delete actionMaps[i];
+		actionMaps[i] = nullptr;
+	}
 }
 
 void InputManager::AddAction(InputAction* action)
@@ -18,6 +28,16 @@ void InputManager::AddAction(InputAction* action)
 	actions.push_back(action);
 }
 
+void InputManager::AddActionMap(InputActionMap * action)
+{
+	for (int i = 0; i < actionMaps.size(); i++)
+	{
+		if (actionMaps[i]->Name() == action->Name())
+			return;
+	}
+	actionMaps.push_back(action);
+}
+
 void InputManager::UpdatePressed(cocos2d::EventKeyboard::KeyCode keyCode)
 {
 	for (int i = 0; i < actions.size(); i++)
@@ -26,7 +46,23 @@ void InputManager::UpdatePressed(cocos2d::EventKeyboard::KeyCode keyCode)
 	}
 }
 
+void InputManager::UpdatePressed(cocos2d::EventMouse::MouseButton keyCode)
+{
+	for (int i = 0; i < actions.size(); i++)
+	{
+		actions[i]->UpdatePressed(keyCode);
+	}
+}
+
 void InputManager::UpdateReleased(cocos2d::EventKeyboard::KeyCode keyCode)
+{
+	for (int i = 0; i < actions.size(); i++)
+	{
+		actions[i]->UpdateReleased(keyCode);
+	}
+}
+
+void InputManager::UpdateReleased(cocos2d::EventMouse::MouseButton keyCode)
 {
 	for (int i = 0; i < actions.size(); i++)
 	{
@@ -55,6 +91,23 @@ InputAction* InputManager::GetAction(std::string name)
 	}
 	catch (int e)
 	{
-		std::cout << "Input action name not found" << std::endl;
+		cocos2d::log("Input action name not found");
+	}
+}
+
+InputActionMap * InputManager::GetActionMap(std::string name)
+{
+	try
+	{
+		for (int i = 0; i < actionMaps.size(); i++)
+		{
+			if (actionMaps[i]->Name() == name)
+				return actionMaps[i];
+		}
+		throw 1;
+	}
+	catch (int e)
+	{
+		cocos2d::log("Input action map name not found");
 	}
 }

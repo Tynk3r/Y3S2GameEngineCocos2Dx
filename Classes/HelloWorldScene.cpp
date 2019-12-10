@@ -124,15 +124,24 @@ bool HelloWorld::init()
 	this->addChild(nodeItems, 1);
 
 	//Creating Inputs
-	InputAction* moveLeft = new InputAction();
-	moveLeft->SetName("Move Left");
+	InputAction* moveLeft = new InputAction("Move Left");
 	moveLeft->AddBinding(EventKeyboard::KeyCode::KEY_A);
 	moveLeft->AddBinding(EventKeyboard::KeyCode::KEY_LEFT_ARROW);
 
-	InputAction* moveRight = new InputAction();
-	moveRight->SetName("Move Right");
+	InputAction* moveRight = new InputAction("Move Right");
 	moveRight->AddBinding(EventKeyboard::KeyCode::KEY_D);
 	moveRight->AddBinding(EventKeyboard::KeyCode::KEY_RIGHT_ARROW);
+
+	InputAction* mouseMovement = new InputAction("Mouse Movement");
+	mouseMovement->AddBinding(EventMouse::MouseButton::BUTTON_LEFT);
+
+	InputAction* toggleMovement = new InputAction("Toggle Movement");
+	toggleMovement->AddBinding(EventKeyboard::KeyCode::KEY_P);
+
+	InputActionMap* playerMovement = new InputActionMap("Player Movement");
+	playerMovement->AddAction(moveLeft);
+	playerMovement->AddAction(moveRight);
+	playerMovement->AddAction(mouseMovement);
 
 	//Keyboard Event
 	auto listener = EventListenerKeyboard::create();
@@ -142,7 +151,8 @@ bool HelloWorld::init()
 	//Mouse Event
 	auto listenerMouse = EventListenerMouse::create();
 	listenerMouse->onMouseDown = CC_CALLBACK_1(HelloWorld::onMouseDown, this);
-	listenerMouse->onMouseDown = CC_CALLBACK_1(HelloWorld::onMouseUp, this);
+	listenerMouse->onMouseUp = CC_CALLBACK_1(HelloWorld::onMouseUp, this);
+	listenerMouse->onMouseMove = CC_CALLBACK_1(HelloWorld::onMouseMove, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerMouse, this);
 
 	//Update
@@ -168,50 +178,33 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 
 void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 {
-	//if (std::find(keysHeld.begin(), keysHeld.end(), keyCode) == keysHeld.end()) 
-	//{
-	//	keysHeld.push_back(keyCode);
-	//}
 	InputManager::GetInstance()->UpdatePressed(keyCode);
 }
 
 void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
 {
-	//keysHeld.erase(std::remove(keysHeld.begin(), keysHeld.end(), keyCode), keysHeld.end());
 	InputManager::GetInstance()->UpdateReleased(keyCode);
 }
 
 void HelloWorld::onMouseDown(EventMouse* e)
 {
+	InputManager::GetInstance()->UpdatePressed(e->getMouseButton());
 }
 
 void HelloWorld::onMouseUp(EventMouse* e)
 {
-	auto currSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
-	auto moveEvent = MoveTo::create(Vec2(e->getCursorX(), e->getCursorY()).getDistance(currSprite->getPosition())/100.0f, Vec2(e->getCursorX(), e->getCursorY()));
-	currSprite->stopAllActions();
-	currSprite->runAction(moveEvent);
+	InputManager::GetInstance()->UpdateReleased(e->getMouseButton());
+}
 
-	//Animation
-
-	//Load movement animation
-	Vector<SpriteFrame*> animFrames;
-	animFrames.reserve(4);
-	animFrames.pushBack(SpriteFrame::create("Blue_Back2.png", Rect(0, 0, 65, 81)));
-	animFrames.pushBack(SpriteFrame::create("Blue_Back1.png", Rect(0, 0, 65, 81)));
-	animFrames.pushBack(SpriteFrame::create("Blue_Back3.png", Rect(0, 0, 65, 81)));
-	animFrames.pushBack(SpriteFrame::create("Blue_Back1.png", Rect(0, 0, 65, 81)));
-
-	Animation* animation = Animation::createWithSpriteFrames(animFrames, 0.5f);
-	Animate* animateMove = Animate::create(animation);
-
-	currSprite->runAction(RepeatForever::create(animateMove));
+void HelloWorld::onMouseMove(EventMouse * e)
+{
+	delete mouseData;
+	mouseData = nullptr;
+	mouseData = new EventMouse(*e);
 }
 
 void HelloWorld::Update(float interval)
 {
-	InputManager::GetInstance()->Update();
-
 	if (InputManager::GetInstance()->GetAction("Move Left")->Held())
 	{
 		auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
@@ -221,11 +214,6 @@ void HelloWorld::Update(float interval)
 		//Physics movement
 		PhysicsBody* curPhysics = curSprite->getPhysicsBody();
 		curPhysics->setVelocity(Vec2(-100.0f, curPhysics->getVelocity().y));
-		
-		//auto animationCache = AnimationCache::getInstance();
-		//animationCache->addAnimationsWithFile("sprite_ani.plist");
-		//auto animation = animationCache->animationByName("walk_left");		//auto animate = Animate::create(animation);
-		//curSprite->runAction(animate);
 	}
 	else if (InputManager::GetInstance()->GetAction("Move Right")->Held())
 	{
@@ -236,11 +224,28 @@ void HelloWorld::Update(float interval)
 		//Physics movement
 		PhysicsBody* curPhysics = curSprite->getPhysicsBody();
 		curPhysics->setVelocity(Vec2(100.0f, curPhysics->getVelocity().y));
-		
-		//auto animationCache = AnimationCache::getInstance();
-		//animationCache->addAnimationsWithFile("sprite_ani.plist");
-		//auto animation = animationCache->animationByName("walk_right");		//auto animate = Animate::create(animation);
-		//curSprite->runAction(animate);
+	}
+	else if (InputManager::GetInstance()->GetAction("Mouse Movement")->Pressed())
+	{
+		auto currSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
+		auto moveEvent = MoveTo::create(Vec2(mouseData->getCursorX(), mouseData->getCursorY()).getDistance(currSprite->getPosition()) / 100.0f, Vec2(mouseData->getCursorX(), mouseData->getCursorY()));
+		currSprite->stopAllActions();
+		currSprite->runAction(moveEvent);
+
+		//Animation
+
+		//Load movement animation
+		Vector<SpriteFrame*> animFrames;
+		animFrames.reserve(4);
+		animFrames.pushBack(SpriteFrame::create("Blue_Back2.png", Rect(0, 0, 65, 81)));
+		animFrames.pushBack(SpriteFrame::create("Blue_Back1.png", Rect(0, 0, 65, 81)));
+		animFrames.pushBack(SpriteFrame::create("Blue_Back3.png", Rect(0, 0, 65, 81)));
+		animFrames.pushBack(SpriteFrame::create("Blue_Back1.png", Rect(0, 0, 65, 81)));
+
+		Animation* animation = Animation::createWithSpriteFrames(animFrames, 0.5f);
+		Animate* animateMove = Animate::create(animation);
+
+		currSprite->runAction(RepeatForever::create(animateMove));
 	}
 	else
 	{
@@ -250,5 +255,12 @@ void HelloWorld::Update(float interval)
 		PhysicsBody* curPhysics = curSprite->getPhysicsBody();
 		curPhysics->setVelocity(Vec2(0.0f, curPhysics->getVelocity().y));
 	}
+
+	if (InputManager::GetInstance()->GetAction("Toggle Movement")->Pressed())
+	{
+		InputManager::GetInstance()->GetActionMap("Player Movement")->SetEnabled(!InputManager::GetInstance()->GetActionMap("Player Movement")->Enabled());
+	}
+
+	InputManager::GetInstance()->Update();
 
 }

@@ -25,6 +25,7 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
 #include "LoadingScene.h"
+#include "Input/InputManager.h"
 
 // #define USE_AUDIO_ENGINE 1
 // #define USE_SIMPLE_AUDIO_ENGINE 1
@@ -59,6 +60,8 @@ AppDelegate::~AppDelegate()
 #elif USE_SIMPLE_AUDIO_ENGINE
     SimpleAudioEngine::end();
 #endif
+
+	InputManager::GetInstance()->Destroy();
 }
 
 // if you want a different context, modify the value of glContextAttrs

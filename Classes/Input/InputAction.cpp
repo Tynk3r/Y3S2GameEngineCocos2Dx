@@ -1,14 +1,14 @@
 #include "InputAction.h"
 #include "InputManager.h"
 
-InputAction::InputAction()
+InputAction::InputAction(std::string name_)
 {
 	pressed = false;
 	released = false;
 	held = false;
 	enabled = true;
-	InputManager inputManager;
-	inputManager.GetInstance()->AddAction(this);
+	name = name_;
+	InputManager::GetInstance()->AddAction(this);
 }
 
 
@@ -27,6 +27,17 @@ void InputAction::AddBinding(cocos2d::EventKeyboard::KeyCode binding)
 	return;
 }
 
+void InputAction::AddBinding(cocos2d::EventMouse::MouseButton binding)
+{
+	for (int i = 0; i < mouseBindings.size(); i++)
+	{
+		if (mouseBindings[i] == binding)
+			return;
+	}
+	mouseBindings.push_back(binding);
+	return;
+}
+
 void InputAction::RemoveBinding(cocos2d::EventKeyboard::KeyCode binding)
 {
 	for (int i = 0; i < bindings.size(); i++)
@@ -34,6 +45,18 @@ void InputAction::RemoveBinding(cocos2d::EventKeyboard::KeyCode binding)
 		if (bindings[i] == binding)
 		{
 			bindings.erase(bindings.begin() + i);
+			return;
+		}
+	}
+}
+
+void InputAction::RemoveBinding(cocos2d::EventMouse::MouseButton binding)
+{
+	for (int i = 0; i < mouseBindings.size(); i++)
+	{
+		if (mouseBindings[i] == binding)
+		{
+			mouseBindings.erase(mouseBindings.begin() + i);
 			return;
 		}
 	}
@@ -90,6 +113,21 @@ void InputAction::UpdatePressed(cocos2d::EventKeyboard::KeyCode keyCode)
 	}
 }
 
+void InputAction::UpdatePressed(cocos2d::EventMouse::MouseButton keyCode)
+{
+	if (!enabled)
+		return;
+	for (int i = 0; i < mouseBindings.size(); i++)
+	{
+		if (mouseBindings[i] == keyCode)
+		{
+			pressed = true;
+			held = true;
+			return;
+		}
+	}
+}
+
 void InputAction::UpdateReleased(cocos2d::EventKeyboard::KeyCode keyCode)
 {
 	if (!enabled)
@@ -97,6 +135,21 @@ void InputAction::UpdateReleased(cocos2d::EventKeyboard::KeyCode keyCode)
 	for (int i = 0; i < bindings.size(); i++)
 	{
 		if (bindings[i] == keyCode)
+		{
+			released = true;
+			held = false;
+			return;
+		}
+	}
+}
+
+void InputAction::UpdateReleased(cocos2d::EventMouse::MouseButton keyCode)
+{
+	if (!enabled)
+		return;
+	for (int i = 0; i < mouseBindings.size(); i++)
+	{
+		if (mouseBindings[i] == keyCode)
 		{
 			released = true;
 			held = false;
