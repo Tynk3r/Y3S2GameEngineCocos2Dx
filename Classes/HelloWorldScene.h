@@ -28,14 +28,24 @@
 #include "cocos2d.h"
 #include <vector>
 
+using namespace cocos2d;
+
 class HelloWorld : public cocos2d::Scene
 {
+private:
+	GLProgram* proPostProcess;
+	RenderTexture* rendtex;
+	Sprite* rendtexSprite;
+
+	float darkness = 1.0f;
 public:
-    static cocos2d::Scene* createScene();
+    static Scene* createScene();
 
     virtual bool init();
 
-	void graySprite(cocos2d::Sprite* sprite);
+	void graySprite(Sprite* sprite);
+
+	void charEffectSprite(Sprite* sprite);
     
 	//Keyboard Event
 	//std::vector<cocos2d::EventKeyboard::KeyCode> keysHeld;
