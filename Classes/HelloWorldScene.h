@@ -38,22 +38,12 @@ public:
 	//Keyboard Event
 	//std::vector<cocos2d::EventKeyboard::KeyCode> keysHeld;
 	void Update(float interval);
-	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
-	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
-
-	//Mouse Event
-	void onMouseDown(cocos2d::EventMouse* e);
-	void onMouseUp(cocos2d::EventMouse* e);
-	void onMouseMove(cocos2d::EventMouse* e);
 
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
-
-private:
-	cocos2d::EventMouse* mouseData;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

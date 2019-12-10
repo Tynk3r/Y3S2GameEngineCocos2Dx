@@ -16,16 +16,24 @@ public:
 	void AddAction(InputAction* action);
 	void AddActionMap(InputActionMap* action);
 
-	void UpdatePressed(cocos2d::EventKeyboard::KeyCode keyCode);
-	void UpdatePressed(cocos2d::EventMouse::MouseButton keyCode);
-	void UpdateReleased(cocos2d::EventKeyboard::KeyCode keyCode);
-	void UpdateReleased(cocos2d::EventMouse::MouseButton keyCode);
+	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+
+	void onMouseDown(cocos2d::EventMouse* e);
+	void onMouseUp(cocos2d::EventMouse* e);
+	void onMouseMove(cocos2d::EventMouse* e);
+
+	void SetListeners(cocos2d::Node* node);
+
 	void Update();
+
+	cocos2d::EventMouse* GetMouseData();
 
 	InputAction* GetAction(std::string name);
 	InputActionMap* GetActionMap(std::string name);
 
 private:
+	cocos2d::EventMouse* mouseData;
 	std::vector<InputAction*> actions;
 	std::vector<InputActionMap*> actionMaps;
 };

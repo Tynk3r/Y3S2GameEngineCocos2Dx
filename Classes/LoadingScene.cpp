@@ -87,9 +87,9 @@ bool LoadingScene::init()
 
 void LoadingScene::update(float dt)
 {
-	auto scene = LoadingScene::createScene();
-	auto director = Director::getInstance();
-	return director->replaceScene(scene);
+	//auto scene = LoadingScene::createScene();
+	//auto director = Director::getInstance();
+	//return director->replaceScene(scene);
 }
 
 

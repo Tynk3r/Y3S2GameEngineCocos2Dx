@@ -2,6 +2,7 @@
 
 InputManager::InputManager()
 {
+	mouseData = nullptr;
 }
 
 InputManager::~InputManager()
@@ -38,7 +39,7 @@ void InputManager::AddActionMap(InputActionMap * action)
 	actionMaps.push_back(action);
 }
 
-void InputManager::UpdatePressed(cocos2d::EventKeyboard::KeyCode keyCode)
+void InputManager::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event * event)
 {
 	for (int i = 0; i < actions.size(); i++)
 	{
@@ -46,15 +47,7 @@ void InputManager::UpdatePressed(cocos2d::EventKeyboard::KeyCode keyCode)
 	}
 }
 
-void InputManager::UpdatePressed(cocos2d::EventMouse::MouseButton keyCode)
-{
-	for (int i = 0; i < actions.size(); i++)
-	{
-		actions[i]->UpdatePressed(keyCode);
-	}
-}
-
-void InputManager::UpdateReleased(cocos2d::EventKeyboard::KeyCode keyCode)
+void InputManager::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event * event)
 {
 	for (int i = 0; i < actions.size(); i++)
 	{
@@ -62,12 +55,42 @@ void InputManager::UpdateReleased(cocos2d::EventKeyboard::KeyCode keyCode)
 	}
 }
 
-void InputManager::UpdateReleased(cocos2d::EventMouse::MouseButton keyCode)
+void InputManager::onMouseDown(cocos2d::EventMouse * e)
 {
 	for (int i = 0; i < actions.size(); i++)
 	{
-		actions[i]->UpdateReleased(keyCode);
+		actions[i]->UpdatePressed(e->getMouseButton());
 	}
+}
+
+void InputManager::onMouseUp(cocos2d::EventMouse * e)
+{
+	for (int i = 0; i < actions.size(); i++)
+	{
+		actions[i]->UpdateReleased(e->getMouseButton());
+	}
+}
+
+void InputManager::onMouseMove(cocos2d::EventMouse * e)
+{
+	delete mouseData;
+	mouseData = nullptr;
+	mouseData = new cocos2d::EventMouse(*e);
+}
+
+void InputManager::SetListeners(cocos2d::Node * node)
+{
+	//Keyboard Event
+	auto listener = cocos2d::EventListenerKeyboard::create();
+	listener->onKeyPressed = CC_CALLBACK_2(InputManager::onKeyPressed, this);
+	listener->onKeyReleased = CC_CALLBACK_2(InputManager::onKeyReleased, this);
+	cocos2d::Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, node);
+	//Mouse Event
+	auto listenerMouse = cocos2d::EventListenerMouse::create();
+	listenerMouse->onMouseDown = CC_CALLBACK_1(InputManager::onMouseDown, this);
+	listenerMouse->onMouseUp = CC_CALLBACK_1(InputManager::onMouseUp, this);
+	listenerMouse->onMouseMove = CC_CALLBACK_1(InputManager::onMouseMove, this);
+	cocos2d::Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listenerMouse, node);
 }
 
 void InputManager::Update()
@@ -76,6 +99,11 @@ void InputManager::Update()
 	{
 		actions[i]->Update();
 	}
+}
+
+cocos2d::EventMouse* InputManager::GetMouseData()
+{
+	return mouseData;
 }
 
 InputAction* InputManager::GetAction(std::string name)

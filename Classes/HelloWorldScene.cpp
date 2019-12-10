@@ -124,6 +124,8 @@ bool HelloWorld::init()
 	this->addChild(nodeItems, 1);
 
 	//Creating Inputs
+	InputManager::GetInstance()->SetListeners(this);
+
 	InputAction* moveLeft = new InputAction("Move Left");
 	moveLeft->AddBinding(EventKeyboard::KeyCode::KEY_A);
 	moveLeft->AddBinding(EventKeyboard::KeyCode::KEY_LEFT_ARROW);
@@ -142,18 +144,6 @@ bool HelloWorld::init()
 	playerMovement->AddAction(moveLeft);
 	playerMovement->AddAction(moveRight);
 	playerMovement->AddAction(mouseMovement);
-
-	//Keyboard Event
-	auto listener = EventListenerKeyboard::create();
-	listener->onKeyPressed = CC_CALLBACK_2(HelloWorld::onKeyPressed, this);
-	listener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-	//Mouse Event
-	auto listenerMouse = EventListenerMouse::create();
-	listenerMouse->onMouseDown = CC_CALLBACK_1(HelloWorld::onMouseDown, this);
-	listenerMouse->onMouseUp = CC_CALLBACK_1(HelloWorld::onMouseUp, this);
-	listenerMouse->onMouseMove = CC_CALLBACK_1(HelloWorld::onMouseMove, this);
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerMouse, this);
 
 	//Update
 	this->schedule(schedule_selector(HelloWorld::Update));
@@ -174,33 +164,6 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
     //_eventDispatcher->dispatchEvent(&customEndEvent);
 
 
-}
-
-void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
-{
-	InputManager::GetInstance()->UpdatePressed(keyCode);
-}
-
-void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
-{
-	InputManager::GetInstance()->UpdateReleased(keyCode);
-}
-
-void HelloWorld::onMouseDown(EventMouse* e)
-{
-	InputManager::GetInstance()->UpdatePressed(e->getMouseButton());
-}
-
-void HelloWorld::onMouseUp(EventMouse* e)
-{
-	InputManager::GetInstance()->UpdateReleased(e->getMouseButton());
-}
-
-void HelloWorld::onMouseMove(EventMouse * e)
-{
-	delete mouseData;
-	mouseData = nullptr;
-	mouseData = new EventMouse(*e);
 }
 
 void HelloWorld::Update(float interval)
@@ -228,7 +191,7 @@ void HelloWorld::Update(float interval)
 	else if (InputManager::GetInstance()->GetAction("Mouse Movement")->Pressed())
 	{
 		auto currSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
-		auto moveEvent = MoveTo::create(Vec2(mouseData->getCursorX(), mouseData->getCursorY()).getDistance(currSprite->getPosition()) / 100.0f, Vec2(mouseData->getCursorX(), mouseData->getCursorY()));
+		auto moveEvent = MoveTo::create(Vec2(InputManager::GetInstance()->GetMouseData()->getCursorX(), InputManager::GetInstance()->GetMouseData()->getCursorY()).getDistance(currSprite->getPosition()) / 100.0f, Vec2(InputManager::GetInstance()->GetMouseData()->getCursorX(), InputManager::GetInstance()->GetMouseData()->getCursorY()));
 		currSprite->stopAllActions();
 		currSprite->runAction(moveEvent);
 
