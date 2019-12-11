@@ -26,7 +26,7 @@
 #include "SimpleAudioEngine.h"
 #include "Input/InputManager.h"
 #include "Scene Management/SceneManager.h"
-#include "SceneManagementTestScene.h"
+#include "SpaceshipScene.h"
 #include "Anim/CAnimation.h"
 #include "Nodes.h"
 
@@ -337,7 +337,7 @@ void HelloWorld::Update(float interval)
 		tempResources.push_back("big - Copy (7).png");
 		tempResources.push_back("big - Copy (8).png");
 
-		SceneManager::GetInstance()->ReplaceScene(SceneManagementTestScene::createScene(), tempResources);
+		SceneManager::GetInstance()->ReplaceScene(SpaceshipScene::createScene(), tempResources);
 	}
 	auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
 	auto visibleSize = Director::getInstance()->getVisibleSize();

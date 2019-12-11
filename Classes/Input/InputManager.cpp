@@ -7,6 +7,7 @@ InputManager::InputManager()
 
 InputManager::~InputManager()
 {
+	//Garbage collection, deleted in AppDelegate
 	for (int i = 0; i < actions.size(); i++)
 	{
 		delete actions[i];
@@ -23,7 +24,7 @@ void InputManager::AddAction(InputAction* action)
 {
 	for (int i = 0; i < actions.size(); i++)
 	{
-		if (actions[i]->Name() == action->Name())
+		if (actions[i]->Name() == action->Name()) //Doesn't add if already there
 			return;
 	}
 	actions.push_back(action);
@@ -33,7 +34,7 @@ void InputManager::AddActionMap(InputActionMap * action)
 {
 	for (int i = 0; i < actionMaps.size(); i++)
 	{
-		if (actionMaps[i]->Name() == action->Name())
+		if (actionMaps[i]->Name() == action->Name()) //Doesn't add if already there
 			return;
 	}
 	actionMaps.push_back(action);

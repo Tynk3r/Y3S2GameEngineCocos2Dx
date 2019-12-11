@@ -31,7 +31,6 @@
 #include "SimpleAudioEngine.h"
 #include "Input/InputManager.h"
 #include "Scene Management/SceneManager.h"
-#include "SceneManagementTestScene.h"
 #include "Anim/CAnimation.h"
 
 USING_NS_CC;
