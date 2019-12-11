@@ -5,6 +5,7 @@ InputActionMap::InputActionMap(std::string name_)
 {
 	name = name_;
 	enabled = true;
+	//Adds to input manager immediately so it can get referenced through the manager.
 	InputManager::GetInstance()->AddActionMap(this);
 }
 
@@ -16,7 +17,7 @@ void InputActionMap::AddAction(InputAction * action)
 {
 	for (int i = 0; i < actions.size(); i++)
 	{
-		if (actions[i]->Name() == action->Name())
+		if (actions[i]->Name() == action->Name()) //Doesn't add if already there
 			return;
 	}
 	actions.push_back(action);

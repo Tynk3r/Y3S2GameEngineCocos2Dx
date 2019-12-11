@@ -78,6 +78,7 @@ bool LoadingScene::init()
 
 void LoadingScene::Update(float interval)
 {
+	SceneManager::GetInstance()->GetSceneToLoad()->init();
 	SceneManager::GetInstance()->ReplaceScene(SceneManager::GetInstance()->GetSceneToLoad());
 }
 

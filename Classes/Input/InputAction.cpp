@@ -8,6 +8,7 @@ InputAction::InputAction(std::string name_)
 	held = false;
 	enabled = true;
 	name = name_;
+	//Adds to input manager immediately so it can update and get referenced through the manager.
 	InputManager::GetInstance()->AddAction(this);
 }
 
@@ -20,7 +21,7 @@ void InputAction::AddBinding(cocos2d::EventKeyboard::KeyCode binding)
 {
 	for (int i = 0; i < bindings.size(); i++)
 	{
-		if (bindings[i] == binding)
+		if (bindings[i] == binding) //Doesn't add if already there
 			return;
 	}
 	bindings.push_back(binding);
@@ -31,7 +32,7 @@ void InputAction::AddBinding(cocos2d::EventMouse::MouseButton binding)
 {
 	for (int i = 0; i < mouseBindings.size(); i++)
 	{
-		if (mouseBindings[i] == binding)
+		if (mouseBindings[i] == binding) //Doesn't add if already there
 			return;
 	}
 	mouseBindings.push_back(binding);
@@ -69,7 +70,7 @@ void InputAction::SetName(std::string name_)
 
 void InputAction::SetEnabled(bool enabled_)
 {
-	if (!enabled_)
+	if (!enabled_) //Resets and stops all updates
 	{
 		held = false;
 		released = false;
@@ -160,6 +161,7 @@ void InputAction::UpdateReleased(cocos2d::EventMouse::MouseButton keyCode)
 
 void InputAction::Update()
 {
+	//So pressed and released is true only for one frame
 	if (!enabled)
 		return;
 	pressed = false;
