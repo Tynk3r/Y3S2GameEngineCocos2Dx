@@ -24,6 +24,7 @@
 
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
+#include "SpaceshipScene.h"
 #include "LoadingScene.h"
 #include "Input/InputManager.h"
 
@@ -122,7 +123,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     register_all_packages();
 
     // create a scene. it's an autorelease object
-    auto scene = HelloWorld::createScene();
+    auto scene = SpaceshipScene::createScene();
 
     // run
     director->runWithScene(scene);
