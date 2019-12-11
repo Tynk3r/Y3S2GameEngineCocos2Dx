@@ -71,12 +71,12 @@ bool MainMenuScene::init()
 	// Settings // Open settings menu
 	//// Settings has 2 sliders, 2 checkbox // BGM, SFX // 2 text for BGM and SFX
 	auto BGMLabel = UI::createTTFLabel("BGM", Vec2(visibleSize.width * 0.68, visibleSize.height * 0.58f), "fonts/Marker Felt.ttf", 24, 1, this);
-	auto BGMSlider = UI::createSlider("Slider_Back.png", "SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png", "Slider_PressBar.png",100, 0, Vec2(visibleSize.width * 0.75, visibleSize.height * 0.55f), this);
+	auto BGMSlider = UI::createSlider("Slider_Back.png", "SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png", "Slider_PressBar.png",100, 100, Vec2(visibleSize.width * 0.75, visibleSize.height * 0.55f), this);
 	BGMSlider->addEventListener( CC_CALLBACK_2 (MainMenuScene::SliderEventSetPercent, this) );
 	auto BGMCheckBox = UI::createCheckBox("CheckBox_Normal.png", "CheckBox_Press.png", "CheckBoxNode_Disable.png", "CheckBox_Disable.png", "CheckBoxNode_Normal.png", Vec2(visibleSize.width * 0.9, visibleSize.height * 0.55f), this);
 	BGMCheckBox->addEventListener(CC_CALLBACK_2(MainMenuScene::CheckBoxEventMuteSound, this));
 	auto SFXLabel = UI::createTTFLabel("SFX", Vec2(visibleSize.width * 0.68, visibleSize.height * 0.48f), "fonts/Marker Felt.ttf", 24, 1, this);
-	auto SFXSlider = UI::createSlider("Slider_Back.png", "SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png", "Slider_PressBar.png", 100, 0, Vec2(visibleSize.width * 0.75, visibleSize.height * 0.45f), this);
+	auto SFXSlider = UI::createSlider("Slider_Back.png", "SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png", "Slider_PressBar.png", 100, 100, Vec2(visibleSize.width * 0.75, visibleSize.height * 0.45f), this);
 	SFXSlider->addEventListener(CC_CALLBACK_2(MainMenuScene::SliderEventSetPercent, this));
 
 	auto SFXCheckBox = UI::createCheckBox("CheckBox_Normal.png", "CheckBox_Press.png", "CheckBoxNode_Disable.png", "CheckBox_Disable.png", "CheckBoxNode_Normal.png", Vec2(visibleSize.width * 0.9, visibleSize.height * 0.45f), this);
@@ -135,9 +135,10 @@ void MainMenuScene::ButtonEventChangeScene(Ref * sender, ui::Button::TouchEventT
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		tempResources.push_back("Blue_Back1.png");
-		tempResources.push_back("big - Copy.png");
-		tempResources.push_back("big - Copy (2).png");
-		tempResources.push_back("big - Copy (3).png");
+		tempResources.push_back("Blue_Front1.png");
+		tempResources.push_back("Blue_Front2.png");
+		tempResources.push_back("Blue_Front3.png");
+		tempResources.push_back("ZigzagGrass_Mud_Round.png");
 
 		SceneManager::GetInstance()->ReplaceScene(tempScene, tempResources);
 		break;

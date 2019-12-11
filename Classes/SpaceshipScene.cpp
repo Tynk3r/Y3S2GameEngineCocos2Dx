@@ -32,6 +32,7 @@
 #include "Input/InputManager.h"
 #include "Scene Management/SceneManager.h"
 #include "Anim/CAnimation.h"
+#include "Nodes.h"
 
 USING_NS_CC;
 
@@ -57,7 +58,7 @@ bool SpaceshipScene::init()
 		return false;
 	}
 
-	this->getPhysicsWorld()->setDebugDrawMask(0xffff);
+	//this->getPhysicsWorld()->setDebugDrawMask(0xffff);
 	this->getPhysicsWorld()->setGravity(Vec2(0.f, 0.f));
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
@@ -99,63 +100,27 @@ bool SpaceshipScene::init()
 	spriteNode->setName("spriteNode");
 
 	//Create sprites
-	auto mainSprite = Sprite::create("Spaceship.png");
-	mainSprite->setAnchorPoint(Vec2(0.5, 0.5));
-	mainSprite->setPosition(visibleSize.width * .5f, visibleSize.height * .5f);
-	mainSprite->setScale(.1f);
-	mainSprite->setName("mainSprite");
-	//Create static PhysicsBody
-	auto physicsBody = PhysicsBody::createBox(Size(mainSprite->getContentSize().width, mainSprite->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
+	auto MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mainSprite", "Spaceship.png", Vec2(0.5, 0.5), Vec2(visibleSize.width * .5f, visibleSize.height * .5f), 1, 0.1f);
+	auto physicsBody = PhysicsBody::createBox(Size(MainSpriteNode->getContentSize().width, MainSpriteNode->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
 	physicsBody->setDynamic(true);
 	physicsBody->setVelocityLimit(SPEED_LIMIT);
 	physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
-	mainSprite->addComponent(physicsBody);
+	MainSpriteNode->addComponent(physicsBody);
 
-	auto asteroid1 = Sprite::create("Asteroids/asteroid_01.png");
-	asteroid1->setAnchorPoint(Vec2(0.5, 0.5));
-	asteroid1->setPosition(visibleSize.width * .25f, visibleSize.height * .25f);
-	asteroid1->setScale(1.f);
-	asteroid1->setName("asteroid1");
+	for (int i = 0; i < 3; i++)
+	{
+		auto asteroid1 = Nodes::CreateNodeUsingTextureCache(spriteNode, "asteroid1", "Asteroids/asteroid_01.png", Vec2(i, i), Vec2(visibleSize.width * .25f, visibleSize.height * .25f), 1);
+		string asteroidSprites[4] = { "Asteroids/asteroid_01.png","Asteroids/asteroid_02.png","Asteroids/asteroid_03.png","Asteroids/asteroid_04.png" };
+		Animate* animateAsteroids = CAnimation::createAnimation(asteroidSprites, 4, 81, 101, 0.5f);
+		asteroid1->runAction(RepeatForever::create(animateAsteroids));
 
-	string asteroidSprites[4] = { "Asteroids/asteroid_01.png","Asteroids/asteroid_02.png","Asteroids/asteroid_03.png","Asteroids/asteroid_04.png" };
-	Animate* animateAsteroids = CAnimation::createAnimation(asteroidSprites, 4, 81, 101, 0.5f);
-
-	asteroid1->runAction(RepeatForever::create(animateAsteroids));
-
-
-	//Create static PhysicsBody
-	physicsBody = PhysicsBody::createBox(Size(asteroid1->getContentSize().width, asteroid1->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
-	physicsBody->setDynamic(true);
-	physicsBody->setVelocityLimit(SPEED_LIMIT);
-	physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
-	asteroid1->addComponent(physicsBody);
-
-	spriteNode->addChild(mainSprite, 1);
-	spriteNode->addChild(asteroid1, 1);
-
-	//Load Spritesheet
-	SpriteBatchNode* spritebatch = SpriteBatchNode::create("sprite.png");
-	SpriteFrameCache* cache = SpriteFrameCache::getInstance();
-	cache->addSpriteFramesWithFile("sprite.plist");
-
-	//Creating Sprites from Spritesheet
-	auto Sprite1 = Sprite::createWithSpriteFrameName("Blue_Back1.png");
-	spritebatch->addChild(Sprite1);
-	addChild(spritebatch);
-	//Load idle animation frames
-	Vector<SpriteFrame*> animFrames;
-	animFrames.reserve(4);
-	animFrames.pushBack(SpriteFrame::create("Blue_Front2.png", Rect(0, 0, 65, 81)));
-	animFrames.pushBack(SpriteFrame::create("Blue_Front1.png", Rect(0, 0, 65, 81)));
-	animFrames.pushBack(SpriteFrame::create("Blue_Front3.png", Rect(0, 0, 65, 81)));
-	animFrames.pushBack(SpriteFrame::create("Blue_Front1.png", Rect(0, 0, 65, 81)));
-
-	//Create animation
-	Animation* animation = Animation::createWithSpriteFrames(animFrames, 0.5f);
-	Animate* animateIdle = Animate::create(animation);
-
-	//Run animation
-	//mainSprite->runAction(RepeatForever::create(animateIdle));
+		//Create static PhysicsBody
+		physicsBody = PhysicsBody::createBox(Size(asteroid1->getContentSize().width, asteroid1->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
+		physicsBody->setDynamic(true);
+		physicsBody->setVelocityLimit(SPEED_LIMIT);
+		physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
+		asteroid1->addComponent(physicsBody);
+	}
 
 	//Add containers to scene
 	this->addChild(spriteNode, 1);
@@ -191,9 +156,6 @@ bool SpaceshipScene::init()
 	InputAction* makeDarker = new InputAction("Make Darker");
 	makeDarker->AddBinding(EventKeyboard::KeyCode::KEY_MINUS);
 
-	//Sounds
-	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-	audio->playBackgroundMusic("BackgroundMusic.wav", true);
 
 	//Update
 	this->schedule(schedule_selector(SpaceshipScene::Update));

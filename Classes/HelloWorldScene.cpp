@@ -54,7 +54,7 @@ bool HelloWorld::init()
         return false;
     }
 
-	this->getPhysicsWorld()->setDebugDrawMask(0xffff);
+	//this->getPhysicsWorld()->setDebugDrawMask(0xffff);
 
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -89,45 +89,26 @@ bool HelloWorld::init()
 	this->addChild(rendtexSprite, 2);
 
 	//Init containers
-	auto nodeItems = Node::create();
-	nodeItems->setName("nodeItems");
-	//auto spriteNode = Node::create();
-	//spriteNode->setName("spriteNode");
+	auto spriteNode = Node::create();
+	spriteNode->setName("spriteNode");
 
 	//Create static items
 	auto spriteWidth = Sprite::create("ZigzagGrass_Mud_Round.png")->getContentSize().width;
 	int numOfBlocks = ceil(playingSize.width / spriteWidth);
 	for (int i = 0; i < numOfBlocks; i++)
 	{
-		auto MainSpriteNode = Nodes::CreateNodeWithPhysics("mudNode", "mudSprite", "ZigzagGrass_Mud_Round.png", Vec2::ZERO, Vec2(0 + i * spriteWidth, playingSize.height / 2), PhysicsMaterial(0.1f, 1.0f, 0.0f), 0, this, 1);
-		//auto sprite = Sprite::create("ZigzagGrass_Mud_Round.png");
-		//sprite->setAnchorPoint(Vec2::ZERO);
-		//sprite->setPosition(0 + i * spriteWidth, playingSize.height / 2);
-		////sprite->setPosition(0, 0);
-		//
-		////Create static PhysicsBody
-		//auto physicsBody = PhysicsBody::createBox(Size(sprite->getContentSize().width, sprite->getContentSize().height), PhysicsMaterial(0.1f, 1.0f, 0.0f));
-		//physicsBody->setDynamic(false);
-		//sprite->addComponent(physicsBody);
-		//
-		//nodeItems->addChild(sprite, 0);
+		auto MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mudSprite", "ZigzagGrass_Mud_Round.png", Vec2::ZERO, Vec2(0 + i * spriteWidth, playingSize.height / 2), 0);
+		auto physicsBody = PhysicsBody::createBox(Size(MainSpriteNode->getContentSize().width, MainSpriteNode->getContentSize().height), PhysicsMaterial(0.1f, 1.0f, 0.0f));
+		physicsBody->setDynamic(false);
+		MainSpriteNode->addComponent(physicsBody);
 	}
 
 	// Creating PlayerNode & sprite
-	auto MainSpriteNode = Nodes::CreateNodeWithPhysics("spriteNode", "mainSprite", "Blue_Front1.png", Vec2(0, 0), Vec2(100, playingSize.height / 2 + spriteWidth + 30), PhysicsMaterial(0.001f, 0.1f, 5.0f), 1, this, 1);
+	auto MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mainSprite", "Blue_Front1.png", Vec2(0, 0), Vec2(100, playingSize.height / 2 + spriteWidth + 30), 1);
+	auto physicsBody = PhysicsBody::createBox(Size(MainSpriteNode->getContentSize().width, MainSpriteNode->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
+	physicsBody->setDynamic(true);
+	MainSpriteNode->addComponent(physicsBody);
 
-	//Create sprites
-	//auto mainSprite = Sprite::create("Blue_Front1.png");
-	//mainSprite->setAnchorPoint(Vec2(0, 0));
-	//mainSprite->setPosition(100, playingSize.height / 2 + spriteWidth + 30);
-	//mainSprite->setName("mainSprite");
-
-	//Create static PhysicsBody
-	//auto physicsBody = PhysicsBody::createBox(Size(mainSprite->getContentSize().width, mainSprite->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
-	//physicsBody->setDynamic(true);
-	//mainSprite->addComponent(physicsBody);
-
-	//spriteNode->addChild(mainSprite, 1);
 
 	//Load Spritesheet
 	SpriteBatchNode* spritebatch = SpriteBatchNode::create("sprite.png");
@@ -142,21 +123,20 @@ bool HelloWorld::init()
 	//Load idle animation frames
 	Vector<SpriteFrame*> animFrames;
 	animFrames.reserve(4);
-	animFrames.pushBack(SpriteFrame::create("Blue_Front2.png", Rect(0, 0, 65, 81)));
-	animFrames.pushBack(SpriteFrame::create("Blue_Front1.png", Rect(0, 0, 65, 81)));
-	animFrames.pushBack(SpriteFrame::create("Blue_Front3.png", Rect(0, 0, 65, 81)));
-	animFrames.pushBack(SpriteFrame::create("Blue_Front1.png", Rect(0, 0, 65, 81)));
+	animFrames.pushBack(SpriteFrame::createWithTexture(Director::getInstance()->getTextureCache()->addImage("Blue_Front2.png"), Rect(0, 0, 65, 81)));
+	animFrames.pushBack(SpriteFrame::createWithTexture(Director::getInstance()->getTextureCache()->addImage("Blue_Front1.png"), Rect(0, 0, 65, 81)));
+	animFrames.pushBack(SpriteFrame::createWithTexture(Director::getInstance()->getTextureCache()->addImage("Blue_Front3.png"), Rect(0, 0, 65, 81)));
+	animFrames.pushBack(SpriteFrame::createWithTexture(Director::getInstance()->getTextureCache()->addImage("Blue_Front1.png"), Rect(0, 0, 65, 81)));
 
 	//Create animation
 	Animation* animation = Animation::createWithSpriteFrames(animFrames, 0.5f);
 	Animate* animateIdle = Animate::create(animation);
 
 	//Run animation
-	MainSpriteNode->getChildByName("mainSprite")->runAction(RepeatForever::create(animateIdle));
+	MainSpriteNode->runAction(RepeatForever::create(animateIdle));
 
 	//Add containers to scene
-	//this->addChild(spriteNode, 1);
-	//this->addChild(nodeItems, 1);
+	this->addChild(spriteNode, 1);
 
 	//Creating Inputs
 	InputManager::GetInstance()->SetListeners(this);
@@ -188,25 +168,6 @@ bool HelloWorld::init()
 	playerMovement->AddAction(moveLeft);
 	playerMovement->AddAction(moveRight);
 	playerMovement->AddAction(mouseMovement);
-
-	//Sounds
-	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-	audio->playBackgroundMusic("BackgroundMusic.wav", true);
-
-	//For sound effects(“name of file”,loop, pitch, stereo, gain)
-	//audio->playEffect("Explosion.wav", false, 1.0f, 0.0f, 1.0f);
-
-	////Keyboard Event
-	//auto listener = EventListenerKeyboard::create();
-	//listener->onKeyPressed = CC_CALLBACK_2(HelloWorld::onKeyPressed, this);
-	//listener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
-	//_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-
-	////Mouse Event
-	//auto listenerMouse = EventListenerMouse::create();
-	//listenerMouse->onMouseDown = CC_CALLBACK_1(HelloWorld::onMouseDown, this);
-	//listenerMouse->onMouseDown = CC_CALLBACK_1(HelloWorld::onMouseUp, this);
-	//_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerMouse, this);
 
 	//Update
 	this->schedule(schedule_selector(HelloWorld::Update));
@@ -329,17 +290,17 @@ void HelloWorld::Update(float interval)
 	{
 		SpaceshipScene* tempScene = new SpaceshipScene(); // So Init isn't called immediately
 		std::vector<std::string> tempResources;
-		tempResources.push_back("big - Copy (4).png");
-		tempResources.push_back("big - Copy (5).png");
-		tempResources.push_back("big - Copy (6).png");
-		tempResources.push_back("big - Copy (7).png");
-		tempResources.push_back("big - Copy (8).png");
+		tempResources.push_back("Spaceship.png");
+		tempResources.push_back("Asteroids/asteroid_01.png");
+		tempResources.push_back("Asteroids/asteroid_02.png");
+		tempResources.push_back("Asteroids/asteroid_03.png");
+		tempResources.push_back("Asteroids/asteroid_04.png");
 
 		SceneManager::GetInstance()->ReplaceScene(tempScene, tempResources);
 	}
 	auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
 	auto visibleSize = Director::getInstance()->getVisibleSize();
-	GLProgramState::getOrCreateWithGLProgram(proPostProcess)->setUniformVec2("loc", Vec2(curSprite->getPositionX() / visibleSize.width, curSprite->getPositionY() / visibleSize.height));
+		GLProgramState::getOrCreateWithGLProgram(proPostProcess)->setUniformVec2("loc", Vec2(curSprite->getPositionX() / visibleSize.width, curSprite->getPositionY() / visibleSize.height));
 
 	// Post Processing
 	rendtex->beginWithClear(.0f, .0f, .0f, .0f);
