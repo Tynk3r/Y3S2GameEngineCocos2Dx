@@ -112,11 +112,18 @@ bool SpaceshipScene::init()
 	physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
 	mainSprite->addComponent(physicsBody);
 
-	auto asteroid1 = Sprite::create("Enemy_Ship.png");
+	auto asteroid1 = Sprite::create("Asteroids/asteroid_01.png");
 	asteroid1->setAnchorPoint(Vec2(0.5, 0.5));
 	asteroid1->setPosition(visibleSize.width * .25f, visibleSize.height * .25f);
-	asteroid1->setScale(.1f);
+	asteroid1->setScale(1.f);
 	asteroid1->setName("asteroid1");
+
+	string asteroidSprites[4] = { "Asteroids/asteroid_01.png","Asteroids/asteroid_02.png","Asteroids/asteroid_03.png","Asteroids/asteroid_04.png" };
+	Animate* animateAsteroids = CAnimation::createAnimation(asteroidSprites, 4, 81, 101, 0.5f);
+
+	asteroid1->runAction(RepeatForever::create(animateAsteroids));
+
+
 	//Create static PhysicsBody
 	physicsBody = PhysicsBody::createBox(Size(asteroid1->getContentSize().width, asteroid1->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
 	physicsBody->setDynamic(true);
