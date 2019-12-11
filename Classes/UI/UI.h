@@ -28,6 +28,8 @@ public:
 		const::std::string sliderHandlePressedTexture, 
 		const::std::string sliderHandleDisabledTexture, 
 		const::std::string sliderProgressBarTexture, 
+		int MaxPercentage,
+		int Percentage,
 		cocos2d::Vec2 position, cocos2d::Scene* scene);
 	static cocos2d::ui::LoadingBar * createLoadingBar(const::std::string LoadingBarTexture, cocos2d::ui::LoadingBar::Direction LoadingBarDirection, cocos2d::Vec2 position, cocos2d::Scene* scene);
 	static cocos2d::ui::TextField * createTextField(const::std::string PlaceHolderText, const::std::string FontName, int FontSize, bool PasswordEnabled, int TextFieldLength, cocos2d::Vec2 position, cocos2d::Scene* scene);

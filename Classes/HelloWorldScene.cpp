@@ -99,17 +99,18 @@ bool HelloWorld::init()
 	int numOfBlocks = ceil(playingSize.width / spriteWidth);
 	for (int i = 0; i < numOfBlocks; i++)
 	{
-		auto sprite = Sprite::create("ZigzagGrass_Mud_Round.png");
-		sprite->setAnchorPoint(Vec2::ZERO);
-		sprite->setPosition(0 + i * spriteWidth, playingSize.height / 2);
-		//sprite->setPosition(0, 0);
-
-		//Create static PhysicsBody
-		auto physicsBody = PhysicsBody::createBox(Size(sprite->getContentSize().width, sprite->getContentSize().height), PhysicsMaterial(0.1f, 1.0f, 0.0f));
-		physicsBody->setDynamic(false);
-		sprite->addComponent(physicsBody);
-
-		nodeItems->addChild(sprite, 0);
+		auto MainSpriteNode = Nodes::CreateNodeWithPhysics("mudNode", "mudSprite", "ZigzagGrass_Mud_Round.png", Vec2::ZERO, Vec2(0 + i * spriteWidth, playingSize.height / 2), PhysicsMaterial(0.1f, 1.0f, 0.0f), 0, this, 1);
+		//auto sprite = Sprite::create("ZigzagGrass_Mud_Round.png");
+		//sprite->setAnchorPoint(Vec2::ZERO);
+		//sprite->setPosition(0 + i * spriteWidth, playingSize.height / 2);
+		////sprite->setPosition(0, 0);
+		//
+		////Create static PhysicsBody
+		//auto physicsBody = PhysicsBody::createBox(Size(sprite->getContentSize().width, sprite->getContentSize().height), PhysicsMaterial(0.1f, 1.0f, 0.0f));
+		//physicsBody->setDynamic(false);
+		//sprite->addComponent(physicsBody);
+		//
+		//nodeItems->addChild(sprite, 0);
 	}
 
 	// Creating PlayerNode & sprite
@@ -155,7 +156,7 @@ bool HelloWorld::init()
 
 	//Add containers to scene
 	//this->addChild(spriteNode, 1);
-	this->addChild(nodeItems, 1);
+	//this->addChild(nodeItems, 1);
 
 	//Creating Inputs
 	InputManager::GetInstance()->SetListeners(this);

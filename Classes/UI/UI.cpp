@@ -71,7 +71,7 @@ cocos2d::ui::CheckBox * UI::createCheckBox(const::std::string & checkBoxNormal, 
 }
 
 // slider 
-cocos2d::ui::Slider * UI::createSlider(const::std::string sliderTexture, const::std::string sliderHandleTexture, const::std::string sliderHandlePressedTexture, const::std::string sliderHandleDisabledTexture, const::std::string sliderProgressBarTexture, cocos2d::Vec2 position, cocos2d::Scene* scene)
+cocos2d::ui::Slider * UI::createSlider(const::std::string sliderTexture, const::std::string sliderHandleTexture, const::std::string sliderHandlePressedTexture, const::std::string sliderHandleDisabledTexture, const::std::string sliderProgressBarTexture, int MaxPercentage, int Percentage, cocos2d::Vec2 position, cocos2d::Scene * scene)
 {
 	auto slider = ui::Slider::create();
 	slider->loadBarTexture(sliderTexture);
@@ -79,6 +79,8 @@ cocos2d::ui::Slider * UI::createSlider(const::std::string sliderTexture, const::
 		sliderHandleDisabledTexture);
 	slider->loadProgressBarTexture(sliderProgressBarTexture);
 	slider->setPosition(position);
+	slider->setMaxPercent(MaxPercentage);
+	slider->setPercent(Percentage);
 	scene->addChild(slider);
 	return slider;
 }

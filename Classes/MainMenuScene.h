@@ -29,6 +29,7 @@
 #include <vector>
 #include "extensions/cocos-ext.h"
 #include "UI/CocosGUI.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -41,10 +42,11 @@ public:
     virtual bool init();
 
     // a selector callback
-    void menuCloseCallback(cocos2d::Ref* pSender);
+    void menuCloseCallback(Ref* pSender, ui::Button::TouchEventType type);
 
 	void SliderEventSetPercent(Ref * sender, ui::Slider::EventType type);
 	void ButtonEventChangeScene(Ref * sender, ui::Button::TouchEventType type);
+	void CheckBoxEventMuteSound(Ref * sender, ui::CheckBox::EventType type);
     
     // implement the "static create()" method manually
     CREATE_FUNC(MainMenuScene);
