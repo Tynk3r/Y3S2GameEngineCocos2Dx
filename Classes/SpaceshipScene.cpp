@@ -105,7 +105,6 @@ bool SpaceshipScene::init()
 	mainSprite->setPosition(visibleSize.width * .5f, visibleSize.height * .5f);
 	mainSprite->setScale(.1f);
 	mainSprite->setName("mainSprite");
-
 	//Create static PhysicsBody
 	auto physicsBody = PhysicsBody::createBox(Size(mainSprite->getContentSize().width, mainSprite->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
 	physicsBody->setDynamic(true);
@@ -113,7 +112,20 @@ bool SpaceshipScene::init()
 	physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
 	mainSprite->addComponent(physicsBody);
 
+	auto asteroid1 = Sprite::create("Enemy_Ship.png");
+	asteroid1->setAnchorPoint(Vec2(0.5, 0.5));
+	asteroid1->setPosition(visibleSize.width * .25f, visibleSize.height * .25f);
+	asteroid1->setScale(.1f);
+	asteroid1->setName("asteroid1");
+	//Create static PhysicsBody
+	physicsBody = PhysicsBody::createBox(Size(asteroid1->getContentSize().width, asteroid1->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
+	physicsBody->setDynamic(true);
+	physicsBody->setVelocityLimit(SPEED_LIMIT);
+	physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
+	asteroid1->addComponent(physicsBody);
+
 	spriteNode->addChild(mainSprite, 1);
+	spriteNode->addChild(asteroid1, 1);
 
 	//Load Spritesheet
 	SpriteBatchNode* spritebatch = SpriteBatchNode::create("sprite.png");
@@ -230,10 +242,20 @@ void SpaceshipScene::Update(float interval)
 			spaceshipPhysicsBody->applyForce(DEFAULT_FORCE * -Vec2(0, 1));
 		}
 
+		// screen wrap
+		if (spaceship->getPosition().x > visibleSize.width + (spaceship->getContentSize().width * spaceship->getScale()))
+			spaceship->setPosition(Vec2(-(spaceship->getContentSize().width * spaceship->getScale()), spaceship->getPosition().y));
+		else if (spaceship->getPosition().x < -(spaceship->getContentSize().width * spaceship->getScale()))
+			spaceship->setPosition(Vec2(visibleSize.width + (spaceship->getContentSize().width * spaceship->getScale()), spaceship->getPosition().y));
+
+		if (spaceship->getPosition().y > visibleSize.height + (spaceship->getContentSize().width * spaceship->getScale()))
+			spaceship->setPosition(Vec2(spaceship->getPosition().x, -(spaceship->getContentSize().width * spaceship->getScale())));
+		else if (spaceship->getPosition().y < -(spaceship->getContentSize().width * spaceship->getScale()))
+			spaceship->setPosition(Vec2(spaceship->getPosition().x, visibleSize.height + (spaceship->getContentSize().width * spaceship->getScale())));
+
 		// Update Light Location (following main sprite position in terms of screen)
 		GLProgramState::getOrCreateWithGLProgram(proPostProcess)->setUniformVec2("loc", Vec2(spaceship->getPositionX() / visibleSize.width, spaceship->getPositionY() / visibleSize.height));
 	}
-
 
 	// Post Processing
 	rendtex->beginWithClear(.0f, .0f, .0f, .0f);
