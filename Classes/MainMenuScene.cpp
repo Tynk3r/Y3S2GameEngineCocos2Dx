@@ -110,6 +110,8 @@ void MainMenuScene::SliderEventSetPercent(Ref * sender, ui::Slider::EventType ty
 
 void MainMenuScene::ButtonEventChangeScene(Ref * sender, ui::Button::TouchEventType type)
 {
+	std::vector<std::string> tempResources;
+	HelloWorld* tempScene = new HelloWorld(); // So Init isn't called immediately
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -117,7 +119,12 @@ void MainMenuScene::ButtonEventChangeScene(Ref * sender, ui::Button::TouchEventT
 	case cocos2d::ui::Widget::TouchEventType::MOVED:
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		SceneManager::GetInstance()->ReplaceScene(HelloWorld::createScene());
+		tempResources.push_back("Blue_Back1.png");
+		tempResources.push_back("big - Copy.png");
+		tempResources.push_back("big - Copy (2).png");
+		tempResources.push_back("big - Copy (3).png");
+
+		SceneManager::GetInstance()->ReplaceScene(tempScene, tempResources);
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
 		break;

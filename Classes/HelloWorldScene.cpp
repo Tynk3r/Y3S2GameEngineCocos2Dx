@@ -326,18 +326,15 @@ void HelloWorld::Update(float interval)
 
 	if (InputManager::GetInstance()->GetAction("Change Scene")->Pressed())
 	{
+		SpaceshipScene* tempScene = new SpaceshipScene(); // So Init isn't called immediately
 		std::vector<std::string> tempResources;
-		tempResources.push_back("big.png");
-		tempResources.push_back("big - Copy.png");
-		tempResources.push_back("big - Copy (2).png");
-		tempResources.push_back("big - Copy (3).png");
 		tempResources.push_back("big - Copy (4).png");
 		tempResources.push_back("big - Copy (5).png");
 		tempResources.push_back("big - Copy (6).png");
 		tempResources.push_back("big - Copy (7).png");
 		tempResources.push_back("big - Copy (8).png");
 
-		SceneManager::GetInstance()->ReplaceScene(SpaceshipScene::createScene(), tempResources);
+		SceneManager::GetInstance()->ReplaceScene(tempScene, tempResources);
 	}
 	auto curSprite = this->getChildByName("spriteNode")->getChildByName("mainSprite");
 	auto visibleSize = Director::getInstance()->getVisibleSize();

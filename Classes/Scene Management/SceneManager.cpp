@@ -17,11 +17,11 @@ void SceneManager::ReplaceScene(cocos2d::Scene * scene)
 
 void SceneManager::ReplaceScene(cocos2d::Scene* scene, std::vector<std::string> resourcesToLoad_)
 {
-	if(sceneToLoad != nullptr)
-		sceneToLoad->release();
+	//if(sceneToLoad != nullptr)
+	//	sceneToLoad->release();
 	resourcesToLoad = resourcesToLoad_;
 	sceneToLoad = scene;
-	sceneToLoad->retain();
+	//sceneToLoad->retain();
 	cocos2d::Director::getInstance()->replaceScene(LoadingScene::createScene());
 }
 
