@@ -22,7 +22,7 @@ public:
 		const::std::string & checkBoxActive, 
 		const::std::string & checkBoxActiveDisabled, 
 		cocos2d::Vec2 position, 
-		std::string buttonText, cocos2d::Scene* scene);
+		cocos2d::Scene* scene);
 	static cocos2d::ui::Slider * createSlider(const::std::string sliderTexture, 
 		const::std::string sliderHandleTexture, 
 		const::std::string sliderHandlePressedTexture, 
@@ -31,5 +31,6 @@ public:
 		cocos2d::Vec2 position, cocos2d::Scene* scene);
 	static cocos2d::ui::LoadingBar * createLoadingBar(const::std::string LoadingBarTexture, cocos2d::ui::LoadingBar::Direction LoadingBarDirection, cocos2d::Vec2 position, cocos2d::Scene* scene);
 	static cocos2d::ui::TextField * createTextField(const::std::string PlaceHolderText, const::std::string FontName, int FontSize, bool PasswordEnabled, int TextFieldLength, cocos2d::Vec2 position, cocos2d::Scene* scene);
+
 };
 

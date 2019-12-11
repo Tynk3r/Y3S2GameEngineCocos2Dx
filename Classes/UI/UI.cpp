@@ -60,7 +60,7 @@ cocos2d::ui::Button * UI::createButton(const::std::string & normalImage, const::
 }
 
 // CheckBox
-cocos2d::ui::CheckBox * UI::createCheckBox(const::std::string & checkBoxNormal, const::std::string & checkBoxNormalSelected, const::std::string & checkBoxNormalDisabled, const::std::string & checkBoxActive, const::std::string & checkBoxActiveDisabled, cocos2d::Vec2 position, std::string buttonText, cocos2d::Scene* scene)
+cocos2d::ui::CheckBox * UI::createCheckBox(const::std::string & checkBoxNormal, const::std::string & checkBoxNormalSelected, const::std::string & checkBoxNormalDisabled, const::std::string & checkBoxActive, const::std::string & checkBoxActiveDisabled, cocos2d::Vec2 position, cocos2d::Scene* scene)
 {
 	auto checkbox = ui::CheckBox::create(checkBoxNormal,
 		checkBoxNormalSelected, checkBoxActive,
@@ -103,4 +103,6 @@ cocos2d::ui::TextField * UI::createTextField(const::std::string PlaceHolderText,
 	scene->addChild(textField);
 	return textField;
 }
+
+
 

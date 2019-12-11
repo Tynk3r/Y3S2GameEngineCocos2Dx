@@ -28,6 +28,7 @@
 #include "Scene Management/SceneManager.h"
 #include "SceneManagementTestScene.h"
 #include "Anim/CAnimation.h"
+#include "Nodes.h"
 
 USING_NS_CC;
 
@@ -90,8 +91,8 @@ bool HelloWorld::init()
 	//Init containers
 	auto nodeItems = Node::create();
 	nodeItems->setName("nodeItems");
-	auto spriteNode = Node::create();
-	spriteNode->setName("spriteNode");
+	//auto spriteNode = Node::create();
+	//spriteNode->setName("spriteNode");
 
 	//Create static items
 	auto spriteWidth = Sprite::create("ZigzagGrass_Mud_Round.png")->getContentSize().width;
@@ -111,18 +112,21 @@ bool HelloWorld::init()
 		nodeItems->addChild(sprite, 0);
 	}
 
+	// Creating PlayerNode & sprite
+	auto MainSpriteNode = Nodes::CreateNodeWithPhysics("spriteNode", "mainSprite", "Blue_Front1.png", Vec2(0, 0), Vec2(100, playingSize.height / 2 + spriteWidth + 30), PhysicsMaterial(0.001f, 0.1f, 5.0f), 1, this, 1);
+
 	//Create sprites
-	auto mainSprite = Sprite::create("Blue_Front1.png");
-	mainSprite->setAnchorPoint(Vec2(0, 0));
-	mainSprite->setPosition(100, playingSize.height / 2 + spriteWidth + 30);
-	mainSprite->setName("mainSprite");
+	//auto mainSprite = Sprite::create("Blue_Front1.png");
+	//mainSprite->setAnchorPoint(Vec2(0, 0));
+	//mainSprite->setPosition(100, playingSize.height / 2 + spriteWidth + 30);
+	//mainSprite->setName("mainSprite");
 
 	//Create static PhysicsBody
-	auto physicsBody = PhysicsBody::createBox(Size(mainSprite->getContentSize().width, mainSprite->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
-	physicsBody->setDynamic(true);
-	mainSprite->addComponent(physicsBody);
+	//auto physicsBody = PhysicsBody::createBox(Size(mainSprite->getContentSize().width, mainSprite->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
+	//physicsBody->setDynamic(true);
+	//mainSprite->addComponent(physicsBody);
 
-	spriteNode->addChild(mainSprite, 1);
+	//spriteNode->addChild(mainSprite, 1);
 
 	//Load Spritesheet
 	SpriteBatchNode* spritebatch = SpriteBatchNode::create("sprite.png");
@@ -133,6 +137,7 @@ bool HelloWorld::init()
 	auto Sprite1 = Sprite::createWithSpriteFrameName("Blue_Back1.png");
 	spritebatch->addChild(Sprite1);
 	addChild(spritebatch);
+
 	//Load idle animation frames
 	Vector<SpriteFrame*> animFrames;
 	animFrames.reserve(4);
@@ -146,10 +151,10 @@ bool HelloWorld::init()
 	Animate* animateIdle = Animate::create(animation);
 
 	//Run animation
-	mainSprite->runAction(RepeatForever::create(animateIdle));
+	MainSpriteNode->getChildByName("mainSprite")->runAction(RepeatForever::create(animateIdle));
 
 	//Add containers to scene
-	this->addChild(spriteNode, 1);
+	//this->addChild(spriteNode, 1);
 	this->addChild(nodeItems, 1);
 
 	//Creating Inputs
@@ -185,7 +190,11 @@ bool HelloWorld::init()
 
 	//Sounds
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-	audio->playBackgroundMusic("BackgroundMusic.wav", true);	//For sound effects(“name of file”,loop, pitch, stereo, gain)	//audio->playEffect("Explosion.wav", false, 1.0f, 0.0f, 1.0f);
+	audio->playBackgroundMusic("BackgroundMusic.wav", true);
+
+	//For sound effects(“name of file”,loop, pitch, stereo, gain)
+	//audio->playEffect("Explosion.wav", false, 1.0f, 0.0f, 1.0f);
+
 	////Keyboard Event
 	//auto listener = EventListenerKeyboard::create();
 	//listener->onKeyPressed = CC_CALLBACK_2(HelloWorld::onKeyPressed, this);

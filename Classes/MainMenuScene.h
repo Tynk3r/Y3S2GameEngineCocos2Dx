@@ -27,6 +27,11 @@
 
 #include "cocos2d.h"
 #include <vector>
+#include "extensions/cocos-ext.h"
+#include "UI/CocosGUI.h"
+
+USING_NS_CC;
+USING_NS_CC_EXT;
 
 class MainMenuScene : public cocos2d::Scene
 {
@@ -37,6 +42,9 @@ public:
 
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
+
+	void SliderEventSetPercent(Ref * sender, ui::Slider::EventType type);
+	void ButtonEventChangeScene(Ref * sender, ui::Button::TouchEventType type);
     
     // implement the "static create()" method manually
     CREATE_FUNC(MainMenuScene);

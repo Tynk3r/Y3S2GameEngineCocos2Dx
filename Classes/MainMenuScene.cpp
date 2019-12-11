@@ -21,14 +21,12 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-
+#pragma once
 #include "MainMenuScene.h"
 #include "Scene Management/SceneManager.h"
 #include "SimpleAudioEngine.h"
 #include "UI/UI.h"
 #include "HelloWorldScene.h"
-
-USING_NS_CC;
 
 Scene* MainMenuScene::createScene()
 {
@@ -63,22 +61,10 @@ bool MainMenuScene::init()
 
 	// Start // Load the level
 	auto StartButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width / 2, visibleSize.height * 0.75f), "Start", this);
-	StartButton->addTouchEventListener([&](Ref* sender,
-		ui::Widget::TouchEventType type) {
-		switch (type) {
-		case ui::Widget::TouchEventType::BEGAN:
-			break;
-		case ui::Widget::TouchEventType::ENDED:
-			SceneManager::GetInstance()->ReplaceScene(HelloWorld::createScene());
-			break;
-		default: break;
-		} });
+	StartButton->addTouchEventListener(CC_CALLBACK_2(MainMenuScene::ButtonEventChangeScene, this));
 	auto SettingsButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width / 2, visibleSize.height * 0.5f), "Settings", this);
 
 	auto ExitButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width / 2, visibleSize.height * 0.25f), "Exit", this);
-	//MainMenu->addChild(StartButton, 1);
-	//MainMenu->addChild(SettingsButton);
-	//MainMenu->addChild(ExitButton);
 	auto MainMenu = Menu::create();
 
 
@@ -86,34 +72,18 @@ bool MainMenuScene::init()
 	//// Settings has 2 sliders, 2 checkbox // BGM, SFX // 2 text for BGM and SFX
 	auto BGMLabel = UI::createTTFLabel("BGM", Vec2(visibleSize.width * 0.68, visibleSize.height * 0.58f), "fonts/Marker Felt.ttf", 24, 1, this);
 	auto BGMSlider = UI::createSlider("Slider_Back.png", "SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png", "Slider_PressBar.png", Vec2(visibleSize.width * 0.75, visibleSize.height * 0.55f), this);
-	BGMSlider->setMaxPercent(100);
-	BGMSlider->setPercent(10);
-	BGMSlider->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
-		switch (type) {
-		case ui::Widget::TouchEventType::ENDED:
-			log(BGMSlider->getPercent());
-			break;
-		default: break;
-		} });
-	auto BGMCheckBox = UI::createCheckBox("CheckBox_Normal.png", "CheckBox_Press.png", "CheckBoxNode_Disable.png", "CheckBox_Disable.png", "CheckBoxNode_Normal.png", Vec2(visibleSize.width * 0.9, visibleSize.height * 0.55f), "Mute", this);
+	BGMSlider->addEventListener( CC_CALLBACK_2 (MainMenuScene::SliderEventSetPercent, this) );
+	
+	auto BGMCheckBox = UI::createCheckBox("CheckBox_Normal.png", "CheckBox_Press.png", "CheckBoxNode_Disable.png", "CheckBox_Disable.png", "CheckBoxNode_Normal.png", Vec2(visibleSize.width * 0.9, visibleSize.height * 0.55f), this);
 	auto SFXLabel = UI::createTTFLabel("SFX", Vec2(visibleSize.width * 0.68, visibleSize.height * 0.48f), "fonts/Marker Felt.ttf", 24, 1, this);
 	auto SFXSlider = UI::createSlider("Slider_Back.png", "SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png", "Slider_PressBar.png", Vec2(visibleSize.width * 0.75, visibleSize.height * 0.45f), this);
-	
-	auto SFXCheckBox = UI::createCheckBox("CheckBox_Normal.png", "CheckBox_Press.png", "CheckBoxNode_Disable.png", "CheckBox_Disable.png", "CheckBoxNode_Normal.png", Vec2(visibleSize.width * 0.9, visibleSize.height * 0.45f), "Mute", this);
-	
-	BGMCheckBox->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
-		switch (type) {
-		case ui::Widget::TouchEventType::BEGAN:
-			break;
-		case ui::Widget::TouchEventType::ENDED:
-			break;
-		default: break;
-		} });
+	SFXSlider->addEventListener(CC_CALLBACK_2(MainMenuScene::SliderEventSetPercent, this));
+
+	auto SFXCheckBox = UI::createCheckBox("CheckBox_Normal.png", "CheckBox_Press.png", "CheckBoxNode_Disable.png", "CheckBox_Disable.png", "CheckBoxNode_Normal.png", Vec2(visibleSize.width * 0.9, visibleSize.height * 0.45f), this);
 	// Exit
 	log(BGMSlider->getPercent());
     return true;
 }
-
 
 void MainMenuScene::menuCloseCallback(Ref* pSender)
 {
@@ -127,3 +97,32 @@ void MainMenuScene::menuCloseCallback(Ref* pSender)
 
 
 }
+
+void MainMenuScene::SliderEventSetPercent(Ref * sender, ui::Slider::EventType type)
+{
+	if (type == ui::Slider::EventType::ON_PERCENTAGE_CHANGED)
+	{
+		ui::Slider *slider = dynamic_cast<ui::Slider*>(sender);
+		int percent = slider->getPercent();
+		log("%i", percent);
+	}
+}
+
+void MainMenuScene::ButtonEventChangeScene(Ref * sender, ui::Button::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		SceneManager::GetInstance()->ReplaceScene(HelloWorld::createScene());
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
