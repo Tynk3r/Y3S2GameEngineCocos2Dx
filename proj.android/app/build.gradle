@@ -108,7 +108,6 @@ android {
             }
         }
     }
-    ndkVersion '21.0.6113669'
 }
 
 android.applicationVariants.all { variant ->

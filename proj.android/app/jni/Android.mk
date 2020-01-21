@@ -6,27 +6,11 @@ LOCAL_MODULE := MyGame_shared
 
 LOCAL_MODULE_FILENAME := libMyGame
 
-LOCAL_ARM_MODE := arm
-
 LOCAL_SRC_FILES := $(LOCAL_PATH)/hellocpp/main.cpp \
                    $(LOCAL_PATH)/../../../Classes/AppDelegate.cpp \
-                   $(LOCAL_PATH)/../../../Classes/HelloWorldScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/LoadingScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/MainMenuScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/Nodes.cpp \
-                   $(LOCAL_PATH)/../../../Classes/SpaceshipScene.cpp \
-                   $(LOCAL_PATH)/../../../Classes/Anim/CAnimation.cpp \
-                   $(LOCAL_PATH)/../../../Classes/Input/InputAction.cpp \
-                   $(LOCAL_PATH)/../../../Classes/Input/InputActionMap.cpp \
-                   $(LOCAL_PATH)/../../../Classes/Input/InputManager.cpp \
-                   $(LOCAL_PATH)/../../../Classes/SceneManagement/SceneManager.cpp \
-                   $(LOCAL_PATH)/../../../Classes/UI/UI.cpp
+                   $(LOCAL_PATH)/../../../Classes/HelloWorldScene.cpp
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../../Classes \
-					$(LOCAL_PATH)/../../../Classes/Anim \
-					$(LOCAL_PATH)/../../../Classes/Input \
-					$(LOCAL_PATH)/../../../Classes/SceneManagement \
-					$(LOCAL_PATH)/../../../Classes/UI
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../../Classes
 
 # _COCOS_HEADER_ANDROID_BEGIN
 # _COCOS_HEADER_ANDROID_END

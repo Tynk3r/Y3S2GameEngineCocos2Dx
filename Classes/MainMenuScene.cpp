@@ -23,7 +23,7 @@
  ****************************************************************************/
 #pragma once
 #include "MainMenuScene.h"
-#include "SceneManagement/SceneManager.h"
+#include "Scene Management/SceneManager.h"
 #include "SimpleAudioEngine.h"
 #include "UI/UI.h"
 #include "HelloWorldScene.h"

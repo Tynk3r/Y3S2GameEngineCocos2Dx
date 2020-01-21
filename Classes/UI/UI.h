@@ -16,7 +16,7 @@ public:
 		const::std::string &disabledImage, 
 		cocos2d::Vec2 position, 
 		std::string buttonText, cocos2d::Scene* scene);
-	static cocos2d::ui::CheckBox * createCheckBox(const::std::string & checkBoxNormal,
+	static cocos2d::ui::CheckBox * UI::createCheckBox(const::std::string & checkBoxNormal, 
 		const::std::string & checkBoxNormalSelected, 
 		const::std::string & checkBoxNormalDisabled, 
 		const::std::string & checkBoxActive, 
