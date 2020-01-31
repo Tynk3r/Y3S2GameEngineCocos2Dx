@@ -39,12 +39,12 @@ static void problemLoading(const char* filename)
     printf("Error while loading: %s\n", filename);
     printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in EmptySceneScene.cpp\n");
 }
-
+ 
 // on "init" you need to initialize your instance
 bool MainMenuScene::init()
 {
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-	audio->playBackgroundMusic("BackgroundMusic.wav", true);
+	//audio->playBackgroundMusic("BackgroundMusic.wav", true);
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();

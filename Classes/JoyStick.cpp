@@ -10,28 +10,62 @@ JoyStick::~JoyStick()
 {
 }
 
-JoyStick::JoyStick(std::string backGround, std::string joyStick)
+JoyStick::JoyStick(std::string backGroundFile, std::string joyStickFile, float scale)
 {
-	JSNode = new Node();
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	Texture2D *backGroundtexture = Director::getInstance()->getTextureCache()->addImage(backGround);
-	Rect backGroundtexturerect = Rect::ZERO;
-	backGroundtexturerect.size = backGroundtexture->getContentSize();
-	Sprite *backGroundSprite = Sprite::createWithTexture(backGroundtexture, backGroundtexturerect);
+	Texture2D *backGroundtexture = Director::getInstance()->getTextureCache()->addImage(backGroundFile);
+	Rect backGroundrect = Rect::ZERO;
+	backGroundrect.size = backGroundtexture->getContentSize();
+	Sprite *backGroundframe = Sprite::createWithTexture(backGroundtexture, backGroundrect);
+	
 
-	Texture2D *joySticktexture = Director::getInstance()->getTextureCache()->addImage(backGround);
-	Rect joySticktexturerect = Rect::ZERO;
-	joySticktexturerect.size = joySticktexture->getContentSize();
-	Sprite *joyStickSprite = Sprite::createWithTexture(joySticktexture, joySticktexturerect);
+	Texture2D *joySticktexture = Director::getInstance()->getTextureCache()->addImage(joyStickFile);
+	Rect joyStickrect = Rect::ZERO;
+	joyStickrect.size = joySticktexture->getContentSize();
+	Sprite *joyStickframe = Sprite::createWithTexture(joySticktexture, joyStickrect);
 
+	backGroundSP = backGroundframe;
+	backGroundSP->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+	backGroundSP->setName("BackGroundJoyStick");
+	backGroundSP->setScale(scale);
 
-	Sprite* BGSprite = backGroundSprite;
-	BGSprite->setPosition(Vec2(0, 0));
-	BGSprite->setName("JoyStickBackGround");
-	JSNode->addChild(BGSprite);
+	joyStickSP = joyStickframe;
+	joyStickSP->setPosition(backGroundSP->getPosition());
+	joyStickSP->setName("JoyStick");
+	joyStickSP->setScale(scale);
 
-	Sprite* JSSprite = joyStickSprite;
-	JSSprite->setPosition(backGroundSprite->getPosition());
-	JSSprite->setName("JoyStick");
-	JSNode->addChild(JSSprite);
+	radius = backGroundrect.size.height * 0.5f * scale;
 }
+
+void JoyStick::Active()
+{
+	if (!active)
+	{
+		backGroundSP->setVisible(true);
+		joyStickSP->setVisible(true);
+		active = true;
+	}
+}
+
+void JoyStick::Inactive()
+{
+	if (active)
+	{
+		backGroundSP->setVisible(false);
+		joyStickSP->setVisible(false);
+		active = false;
+	}
+}
+
+float JoyStick::DistanceBetweenCenterAndJoyStick()
+{
+	return joyStickSP->getPosition().distance(backGroundSP->getPosition());
+}
+
+float JoyStick::GetPercentageDistanceBetweenCenterAndJoyStick()
+{
+	return DistanceBetweenCenterAndJoyStick() * radius;
+}
+

@@ -132,7 +132,7 @@ bool SpaceshipScene::init()
 	//Add containers to scene
 	this->addChild(spriteNode, 1);
 	this->addChild(nodeItems, 1);
-	this->addChild(hud,1);
+	this->addChild(hud,2);
 
 	//Creating Inputs
 	InputManager::GetInstance()->SetListeners(this);
