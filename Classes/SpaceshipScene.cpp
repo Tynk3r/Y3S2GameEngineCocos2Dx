@@ -33,6 +33,8 @@
 #include "Scene Management/SceneManager.h"
 #include "Anim/CAnimation.h"
 #include "Nodes.h"
+#include "HUDLayer.h"
+#include "JoyStick.h"
 
 USING_NS_CC;
 
@@ -93,11 +95,14 @@ bool SpaceshipScene::init()
 	rendtexSprite->setShaderProgram(proPostProcess);
 	this->addChild(rendtexSprite, 2);
 
+
 	//Init containers
 	auto nodeItems = Node::create();
 	nodeItems->setName("nodeItems");
 	auto spriteNode = Node::create();
 	spriteNode->setName("spriteNode");
+
+	HUDLayer *hud = HUDLayer::create();
 
 	//Create sprites
 	auto MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mainSprite", "Spaceship.png", Vec2(0.5, 0.5), Vec2(visibleSize.width * .5f, visibleSize.height * .5f), 1, 0.1f);
@@ -107,24 +112,27 @@ bool SpaceshipScene::init()
 	physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
 	MainSpriteNode->addComponent(physicsBody);
 
-	for (int i = 0; i < 3; i++)
-	{
-		auto asteroid1 = Nodes::CreateNodeUsingTextureCache(spriteNode, "asteroid1", "Asteroids/asteroid_01.png", Vec2(i, i), Vec2(visibleSize.width * .25f, visibleSize.height * .25f), 1);
-		string asteroidSprites[4] = { "Asteroids/asteroid_01.png","Asteroids/asteroid_02.png","Asteroids/asteroid_03.png","Asteroids/asteroid_04.png" };
-		Animate* animateAsteroids = CAnimation::createAnimation(asteroidSprites, 4, 81, 101, 0.5f);
-		asteroid1->runAction(RepeatForever::create(animateAsteroids));
 
-		//Create static PhysicsBody
-		physicsBody = PhysicsBody::createBox(Size(asteroid1->getContentSize().width, asteroid1->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
-		physicsBody->setDynamic(true);
-		physicsBody->setVelocityLimit(SPEED_LIMIT);
-		physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
-		asteroid1->addComponent(physicsBody);
-	}
+
+	//for (int i = 0; i < 3; i++)
+	//{
+	//	auto asteroid1 = Nodes::CreateNodeUsingTextureCache(spriteNode, "asteroid1", "Asteroids/asteroid_01.png", Vec2(i, i), Vec2(visibleSize.width * .25f, visibleSize.height * .25f), 1);
+	//	string asteroidSprites[4] = { "Asteroids/asteroid_01.png","Asteroids/asteroid_02.png","Asteroids/asteroid_03.png","Asteroids/asteroid_04.png" };
+	//	Animate* animateAsteroids = CAnimation::createAnimation(asteroidSprites, 4, 81, 101, 0.5f);
+	//	asteroid1->runAction(RepeatForever::create(animateAsteroids));
+	//
+	//	//Create static PhysicsBody
+	//	physicsBody = PhysicsBody::createBox(Size(asteroid1->getContentSize().width, asteroid1->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
+	//	physicsBody->setDynamic(true);
+	//	physicsBody->setVelocityLimit(SPEED_LIMIT);
+	//	physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
+	//	asteroid1->addComponent(physicsBody);
+	//}
 
 	//Add containers to scene
 	this->addChild(spriteNode, 1);
 	this->addChild(nodeItems, 1);
+	this->addChild(hud,2);
 
 	//Creating Inputs
 	InputManager::GetInstance()->SetListeners(this);
