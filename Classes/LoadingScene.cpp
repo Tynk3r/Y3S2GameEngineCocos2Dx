@@ -24,7 +24,7 @@
 
 #include "LoadingScene.h"
 #include "HelloWorldScene.h"
-#include "Scene Management/SceneManager.h"
+#include "SceneManagement/SceneManager.h"
 
 USING_NS_CC;
 

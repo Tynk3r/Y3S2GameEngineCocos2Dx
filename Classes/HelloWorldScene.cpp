@@ -25,7 +25,7 @@
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
 #include "Input/InputManager.h"
-#include "Scene Management/SceneManager.h"
+#include "SceneManagement/SceneManager.h"
 #include "SpaceshipScene.h"
 #include "Anim/CAnimation.h"
 #include "Nodes.h"
