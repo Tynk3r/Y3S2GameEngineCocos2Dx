@@ -104,7 +104,7 @@ bool SpaceshipScene::init()
 	spriteNode->setName("spriteNode");
 
 	hud = HUDLayer::create();
-	auto ShootButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.25, visibleSize.height * 0.75f), "Start", this);
+	auto ShootButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.75, visibleSize.height * 0.25f), "Start", this);
 	hud->addChild(ShootButton);
 
 	//Create sprites
