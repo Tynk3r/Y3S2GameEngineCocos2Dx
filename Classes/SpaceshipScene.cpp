@@ -35,6 +35,7 @@
 #include "Nodes.h"
 #include "HUDLayer.h"
 #include "JoyStick.h"
+#include "UI/UI.h"
 
 USING_NS_CC;
 
@@ -103,6 +104,8 @@ bool SpaceshipScene::init()
 	spriteNode->setName("spriteNode");
 
 	hud = HUDLayer::create();
+	auto TestLabel = UI::createTTFLabel("TEST", Vec2(visibleSize.width * 0.68, visibleSize.height * 0.58f), "fonts/Marker Felt.ttf", 24, 1, this);
+	hud->addChild(TestLabel);
 
 	//Create sprites
 	auto MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mainSprite", "Spaceship.png", Vec2(0.5, 0.5), Vec2(visibleSize.width * .5f, visibleSize.height * .5f), 1, 0.1f);
