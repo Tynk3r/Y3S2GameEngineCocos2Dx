@@ -27,7 +27,7 @@ bool HUDLayer::init() {
 	joyStick = new JoyStick("JoyStickBackGround.png", "JoyStickHandle.png", 0.3);
 	this->addChild(joyStick->joyStickSP, 1);
 	this->addChild(joyStick->backGroundSP,0);
-
+	joyStick->Inactive();
 
 	//auto _spriteToMove = joyStick->joyStickSP;
 	//_spriteToMove->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
@@ -46,19 +46,26 @@ bool HUDLayer::init() {
 
 bool HUDLayer::onTouchBegan(CCTouch * pTouch, CCEvent * pEvent)
 {
-	joyStick->Active();
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+
 	Point touchLoc = pTouch->getLocationInView();
 	touchLoc = cocos2d::CCDirector::sharedDirector()->convertToGL(touchLoc);
 
-	joyStick->backGroundSP->setPosition(touchLoc);
-	joyStick->joyStickSP->setPosition(joyStick->backGroundSP->getPosition());
-	joyStick->centerPoint = joyStick->backGroundSP->getPosition();
-	joyStick->currentPoint = touchLoc;
-
-	if (joyStick->joyStickSP->getBoundingBox().containsPoint(touchLoc))
+	if (touchLoc.x < visibleSize.width * 0.5)
 	{
-		return true;
+		joyStick->Active();
+		
+		joyStick->backGroundSP->setPosition(touchLoc);
+		joyStick->joyStickSP->setPosition(joyStick->backGroundSP->getPosition());
+		joyStick->centerPoint = joyStick->backGroundSP->getPosition();
+		joyStick->currentPoint = touchLoc;
+
+		if (joyStick->joyStickSP->getBoundingBox().containsPoint(touchLoc))
+		{
+			return true;
+		}
 	}
+
 
 	return false;
 }
