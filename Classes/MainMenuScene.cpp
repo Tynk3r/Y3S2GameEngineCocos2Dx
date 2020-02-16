@@ -22,6 +22,7 @@
  THE SOFTWARE.
  ****************************************************************************/
 #pragma once
+#include "Shop.h"
 #include "MainMenuScene.h"
 #include "SceneManagement/SceneManager.h"
 #include "SimpleAudioEngine.h"
@@ -62,6 +63,10 @@ bool MainMenuScene::init()
 	// Start // Load the level
 	auto StartButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width / 2, visibleSize.height * 0.75f), "Start", this);
 	StartButton->addTouchEventListener(CC_CALLBACK_2(MainMenuScene::ButtonEventChangeScene, this));
+
+	auto ShopButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width / 2, visibleSize.height * 0.62f), "Shop", this);
+	ShopButton->addTouchEventListener(CC_CALLBACK_2(MainMenuScene::ButtonEventShopScene, this));
+
 	auto SettingsButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width / 2, visibleSize.height * 0.5f), "Settings", this);
 
 	auto ExitButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width / 2, visibleSize.height * 0.25f), "Exit", this);
@@ -148,6 +153,29 @@ void MainMenuScene::ButtonEventChangeScene(Ref * sender, ui::Button::TouchEventT
 	default:
 		break;
 	}
+}
+
+void MainMenuScene::ButtonEventShopScene(Ref * sender, ui::Button::TouchEventType type)
+{
+	std::vector<std::string> tempResources;
+	Shop* tempScene = new Shop(); // So Init isn't called immediately
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		tempResources.push_back("Blue_Back1.png");
+
+		SceneManager::GetInstance()->ReplaceScene(tempScene, tempResources);
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+	
 }
 
 void MainMenuScene::CheckBoxEventMuteSound(Ref * sender, ui::CheckBox::EventType type)
