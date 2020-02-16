@@ -71,7 +71,7 @@ bool MainMenuScene::init()
 
 	// Settings // Open settings menu
 	//// Settings has 2 sliders, 2 checkbox // BGM, SFX // 2 text for BGM and SFX
-	auto BGMLabel = UI::createTTFLabel("BGM", Vec2(visibleSize.width * 0.68, visibleSize.height * 0.58f), "fonts/Marker Felt.ttf", 24, 1, this);
+	auto BGMLabel = UI::createTTFLabel("BGM", Vec2(visibleSize.width * 0.68, visibleSize.height * 0.58f), "fonts/MarkerFelt.ttf", 24, 1, this);
 	auto BGMSlider = UI::createSlider("Slider_Back.png", "SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png", "Slider_PressBar.png",100, 100, Vec2(visibleSize.width * 0.75, visibleSize.height * 0.55f), this);
 	BGMSlider->addEventListener( CC_CALLBACK_2 (MainMenuScene::SliderEventSetPercent, this) );
 	auto BGMCheckBox = UI::createCheckBox("CheckBox_Normal.png", "CheckBox_Press.png", "CheckBoxNode_Disable.png", "CheckBox_Disable.png", "CheckBoxNode_Normal.png", Vec2(visibleSize.width * 0.9, visibleSize.height * 0.55f), this);
