@@ -59,6 +59,11 @@ void JoyStick::Inactive()
 	}
 }
 
+bool JoyStick::IsActive()
+{
+	return active;
+}
+
 float JoyStick::DistanceBetweenCenterAndJoyStick()
 {
 	return joyStickSP->getPosition().distance(backGroundSP->getPosition());
@@ -66,6 +71,11 @@ float JoyStick::DistanceBetweenCenterAndJoyStick()
 
 float JoyStick::GetPercentageDistanceBetweenCenterAndJoyStick()
 {
-	return DistanceBetweenCenterAndJoyStick() * radius;
+	return DistanceBetweenCenterAndJoyStick() / radius;
+}
+
+cocos2d::Vec2 JoyStick::GetDir()
+{
+	return (joyStickSP->getPosition() - backGroundSP->getPosition()).getNormalized();
 }
 

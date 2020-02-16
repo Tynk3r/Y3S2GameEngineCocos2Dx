@@ -13,6 +13,7 @@ public:
 	void Active();
 	void Inactive();
 	void SetJoyStickPos(Vec2 position);
+	bool IsActive();
 	Sprite* backGroundSP;
 	Sprite* joyStickSP;
 	float radius;
@@ -21,4 +22,5 @@ public:
 
 	float DistanceBetweenCenterAndJoyStick();
 	float GetPercentageDistanceBetweenCenterAndJoyStick();
+	cocos2d::Vec2 GetDir();
 };

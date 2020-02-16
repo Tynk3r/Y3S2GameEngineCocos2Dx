@@ -26,7 +26,10 @@
 #define __SPACESHIP_SCENE_H__
 
 #include "cocos2d.h"
+#include "GameObject.h"
+#include "HUDLayer.h"
 #include <vector>
+#include <iostream>
 
 using namespace cocos2d;
 
@@ -36,8 +39,12 @@ private:
 	GLProgram* proPostProcess;
 	RenderTexture* rendtex;
 	Sprite* rendtexSprite;
-
+    std::vector<GameObject*> m_goList;
 	float darkness = 1.0f;
+    HUDLayer* hud;
+
+    GameObject* FetchGO(cocos2d::Node* node_, GameObject::GAMEOBJECT_TYPE type);
+
 public:
     static Scene* createScene();
 

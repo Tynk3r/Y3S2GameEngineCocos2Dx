@@ -27,6 +27,7 @@
 #include "SimpleAudioEngine.h"
 #include "UI/UI.h"
 #include "HelloWorldScene.h"
+#include "SpaceshipScene.h"
 
 Scene* MainMenuScene::createScene()
 {
@@ -126,7 +127,7 @@ void MainMenuScene::SliderEventSetPercent(Ref * sender, ui::Slider::EventType ty
 void MainMenuScene::ButtonEventChangeScene(Ref * sender, ui::Button::TouchEventType type)
 {
 	std::vector<std::string> tempResources;
-	HelloWorld* tempScene = new HelloWorld(); // So Init isn't called immediately
+	SpaceshipScene* tempScene = new SpaceshipScene(); // So Init isn't called immediately
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:

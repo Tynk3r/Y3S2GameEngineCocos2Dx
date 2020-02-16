@@ -24,8 +24,8 @@
 
 #define DEFAULT_FORCE 100.f
 #define SPEED_LIMIT 100.f
-#define DEFAULT_SPIN_SPEED .01f
-#define SPIN_SPEED_LIMIT 5.f
+#define DEFAULT_SPIN_SPEED 1.f
+#define SPIN_SPEED_LIMIT 1.f
 
 #include "SpaceshipScene.h"
 #include "SimpleAudioEngine.h"
@@ -102,7 +102,7 @@ bool SpaceshipScene::init()
 	auto spriteNode = Node::create();
 	spriteNode->setName("spriteNode");
 
-	HUDLayer *hud = HUDLayer::create();
+	hud = HUDLayer::create();
 
 	//Create sprites
 	auto MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mainSprite", "Spaceship.png", Vec2(0.5, 0.5), Vec2(visibleSize.width * .5f, visibleSize.height * .5f), 1, 0.1f);
@@ -111,23 +111,26 @@ bool SpaceshipScene::init()
 	physicsBody->setVelocityLimit(SPEED_LIMIT);
 	physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
 	MainSpriteNode->addComponent(physicsBody);
+	FetchGO(MainSpriteNode, GameObject::GO_PLAYER);
 
 
 
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	auto asteroid1 = Nodes::CreateNodeUsingTextureCache(spriteNode, "asteroid1", "Asteroids/asteroid_01.png", Vec2(i, i), Vec2(visibleSize.width * .25f, visibleSize.height * .25f), 1);
-	//	string asteroidSprites[4] = { "Asteroids/asteroid_01.png","Asteroids/asteroid_02.png","Asteroids/asteroid_03.png","Asteroids/asteroid_04.png" };
-	//	Animate* animateAsteroids = CAnimation::createAnimation(asteroidSprites, 4, 81, 101, 0.5f);
-	//	asteroid1->runAction(RepeatForever::create(animateAsteroids));
-	//
-	//	//Create static PhysicsBody
-	//	physicsBody = PhysicsBody::createBox(Size(asteroid1->getContentSize().width, asteroid1->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
-	//	physicsBody->setDynamic(true);
-	//	physicsBody->setVelocityLimit(SPEED_LIMIT);
-	//	physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
-	//	asteroid1->addComponent(physicsBody);
-	//}
+	for (int i = 0; i < 3; i++)
+	{
+		auto asteroid1 = Nodes::CreateNodeUsingTextureCache(spriteNode, "asteroid1", "Asteroids/asteroid_01.png", Vec2(i, i), Vec2(visibleSize.width * .25f, visibleSize.height * .25f), 1);
+		string asteroidSprites[4] = { "Asteroids/asteroid_01.png","Asteroids/asteroid_02.png","Asteroids/asteroid_03.png","Asteroids/asteroid_04.png" };
+		Animate* animateAsteroids = CAnimation::createAnimation(asteroidSprites, 4, 81, 101, 0.5f);
+		asteroid1->runAction(RepeatForever::create(animateAsteroids));
+	
+		//Create static PhysicsBody
+		physicsBody = PhysicsBody::createBox(Size(asteroid1->getContentSize().width, asteroid1->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
+		physicsBody->setDynamic(true);
+		physicsBody->setVelocityLimit(SPEED_LIMIT);
+		physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
+		asteroid1->addComponent(physicsBody);
+
+		FetchGO(asteroid1, GameObject::GO_ASTEROID);
+	}
 
 	//Add containers to scene
 	this->addChild(spriteNode, 1);
@@ -218,6 +221,36 @@ void SpaceshipScene::Update(float interval)
 			spaceshipPhysicsBody->applyForce(DEFAULT_FORCE * -Vec2(0, 1));
 		}
 
+		//Touch controls
+		if (hud->joyStick->IsActive())
+		{
+			//Physics movement
+			PhysicsBody* spaceshipPhysicsBody = spaceship->getPhysicsBody();
+			Vec2 spaceshipDirection(cosf(CC_DEGREES_TO_RADIANS(spaceshipPhysicsBody->getRotation())), sinf(CC_DEGREES_TO_RADIANS(spaceshipPhysicsBody->getRotation())));
+			spaceshipDirection.normalize();
+
+			Vec2 temp = hud->joyStick->GetDir();
+			temp.y = -temp.y;
+			float dot = temp.dot(spaceshipDirection);
+
+			if(dot > 0)
+				spaceshipPhysicsBody->setAngularVelocity(-DEFAULT_SPIN_SPEED);
+			else if(dot < 0)
+				spaceshipPhysicsBody->setAngularVelocity(DEFAULT_SPIN_SPEED);
+			else
+			{
+				if(hud->joyStick->GetDir() != spaceshipDirection)
+					spaceshipPhysicsBody->setAngularVelocity(spaceshipPhysicsBody->getAngularVelocity() + DEFAULT_SPIN_SPEED);
+			}
+
+			spaceshipPhysicsBody->applyForce(DEFAULT_FORCE * Vec2(0, hud->joyStick->GetPercentageDistanceBetweenCenterAndJoyStick()));
+		}
+		else
+		{
+			PhysicsBody* spaceshipPhysicsBody = spaceship->getPhysicsBody();
+			spaceshipPhysicsBody->setAngularVelocity(0);
+		}
+
 		// screen wrap
 		if (spaceship->getPosition().x > visibleSize.width + (spaceship->getContentSize().width * spaceship->getScale()))
 			spaceship->setPosition(Vec2(-(spaceship->getContentSize().width * spaceship->getScale()), spaceship->getPosition().y));
@@ -242,4 +275,24 @@ void SpaceshipScene::Update(float interval)
 
 	InputManager::GetInstance()->Update();
 
+}
+
+GameObject* SpaceshipScene::FetchGO(cocos2d::Node* node_, GameObject::GAMEOBJECT_TYPE type)
+{
+	for (auto go : m_goList)
+	{
+		if (!go->active && go->type == type)
+		{
+			go->active = true;
+			go->node = node_;
+			return go;
+		}
+	}
+	for (unsigned i = 0; i < 10; ++i)
+	{
+		GameObject* go = new GameObject(type);
+		m_goList.push_back(go);
+	}
+
+	return FetchGO(node_, type);
 }

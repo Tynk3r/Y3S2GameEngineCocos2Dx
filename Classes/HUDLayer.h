@@ -12,7 +12,6 @@ USING_NS_CC;
 class HUDLayer : public Layer
 {
 private:
-	JoyStick* joyStick;
 	cocos2d::Label *TestLabel;
 public:
 	HUDLayer();
@@ -22,6 +21,8 @@ public:
 	bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event);
 	void onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *event);
 	void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event);
+
+	JoyStick* joyStick;
 };
 
 #endif
