@@ -37,12 +37,17 @@ USING_NS_CC_EXT;
 class Shop : public cocos2d::Scene
 {
 public:
+
+	bool removeAds;
+
 	static cocos2d::Scene* createScene();
 
 	virtual bool init();
+	//void Update(float interval);
 
 	// a selector callback
 	void ButtonEventChangeScene(Ref * sender, ui::Button::TouchEventType type);
+	void RemoveAd(Ref * sender, ui::Button::TouchEventType type);
 
 	// implement the "static create()" method manually
 	CREATE_FUNC(Shop);
