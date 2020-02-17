@@ -119,6 +119,15 @@ bool SpaceshipScene::init()
 	FetchGO(MainSpriteNode, GameObject::GO_PLAYER);
 	player = MainSpriteNode;
 
+	Texture2D *BGtexture = Director::getInstance()->getTextureCache()->addImage("SpaceTexture.jpg");
+	Rect rect = Rect::ZERO;
+	rect.size = BGtexture->getContentSize();
+	auto BG = Sprite::createWithTexture(BGtexture, rect);
+	BG->setAnchorPoint(Vec2(0.5f, 0.5f));
+	BG->setPosition(Vec2(visibleSize.width * .5f, visibleSize.height * .5f));
+	BG->setName("BackGround");
+	BG->setScale(visibleSize.width / BG->getContentSize().width, visibleSize.height / BG->getContentSize().height);
+	this->addChild(BG, 0);
 
 	for (int i = 0; i < 3; i++)
 	{
