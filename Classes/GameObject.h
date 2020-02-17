@@ -11,6 +11,7 @@ struct GameObject
 		GO_NONE = 0,
 		GO_ASTEROID,
 		GO_PLAYER,
+		GO_BULLET,
 		GO_TOTAL, //must be last
 	};
 	GAMEOBJECT_TYPE type;
@@ -19,6 +20,7 @@ struct GameObject
 	cocos2d::Vec2 target;
 	float moveSpeed;
 	StateMachine* sm;
+	int health;
 
 	GameObject(cocos2d::Node* node_, GAMEOBJECT_TYPE typeValue = GO_ASTEROID);
 	GameObject(GAMEOBJECT_TYPE typeValue = GO_ASTEROID);

@@ -2,14 +2,17 @@
 
 GameObject::GameObject(cocos2d::Node* node_, GAMEOBJECT_TYPE typeValue)
 	: type(typeValue),
-	active(false)
+	active(false),
+	health(1)
 {
 	node = node_;
 }
 
 GameObject::GameObject(GAMEOBJECT_TYPE typeValue)
 	: type(typeValue),
-	active(false)
+	active(false),
+	node(nullptr),
+	health(1)
 {
 }
 

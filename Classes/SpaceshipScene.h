@@ -28,6 +28,7 @@
 #include "cocos2d.h"
 #include "GameObject.h"
 #include "HUDLayer.h"
+#include "UI/CocosGUI.h"
 #include <vector>
 #include <iostream>
 
@@ -42,6 +43,8 @@ private:
     std::vector<GameObject*> m_goList;
 	float darkness = 1.0f;
     HUDLayer* hud;
+    Node* spriteNode;
+    Node* player;
 
     GameObject* FetchGO(cocos2d::Node* node_, GameObject::GAMEOBJECT_TYPE type);
 
@@ -56,6 +59,8 @@ public:
 
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
+
+    void ShootButtonEvent(Ref* sender, ui::Button::TouchEventType type);
     
     // implement the "static create()" method manually
     CREATE_FUNC(SpaceshipScene);

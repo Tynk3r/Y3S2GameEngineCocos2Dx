@@ -26,6 +26,7 @@
 #define SPEED_LIMIT 100.f
 #define DEFAULT_SPIN_SPEED 1.f
 #define SPIN_SPEED_LIMIT 1.f
+#define BULLET_SPEED 300.f
 
 #include "SpaceshipScene.h"
 #include "SimpleAudioEngine.h"
@@ -35,6 +36,7 @@
 #include "Nodes.h"
 #include "HUDLayer.h"
 #include "JoyStick.h"
+#include "UI/UI.h"
 
 USING_NS_CC;
 
@@ -99,12 +101,13 @@ bool SpaceshipScene::init()
 	//Init containers
 	auto nodeItems = Node::create();
 	nodeItems->setName("nodeItems");
-	auto spriteNode = Node::create();
+	spriteNode = Node::create();
 	spriteNode->setName("spriteNode");
 
 	hud = HUDLayer::create();
-	auto ShootButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.75, visibleSize.height * 0.25f), "Start", this);
-	hud->addChild(ShootButton);
+	auto ShootButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.75, visibleSize.height * 0.25f), "Shoot", this);
+	ShootButton->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::ShootButtonEvent, this));
+	//hud->addChild(ShootButton);
 
 	//Create sprites
 	auto MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mainSprite", "Spaceship.png", Vec2(0.5, 0.5), Vec2(visibleSize.width * .5f, visibleSize.height * .5f), 1, 0.1f);
@@ -114,7 +117,7 @@ bool SpaceshipScene::init()
 	physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
 	MainSpriteNode->addComponent(physicsBody);
 	FetchGO(MainSpriteNode, GameObject::GO_PLAYER);
-
+	player = MainSpriteNode;
 
 
 	for (int i = 0; i < 3; i++)
@@ -131,7 +134,8 @@ bool SpaceshipScene::init()
 		physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
 		asteroid1->addComponent(physicsBody);
 
-		FetchGO(asteroid1, GameObject::GO_ASTEROID);
+		GameObject* temp = FetchGO(asteroid1, GameObject::GO_ASTEROID);
+		temp->health = 5;
 	}
 
 	//Add containers to scene
@@ -181,6 +185,36 @@ void SpaceshipScene::menuCloseCallback(Ref* pSender)
 {
 	//Close the cocos2d-x game scene and quit the application
 	Director::getInstance()->end();
+}
+
+void SpaceshipScene::ShootButtonEvent(Ref* sender, cocos2d::ui::Button::TouchEventType type)
+{
+	Vec2 tempDir;
+	Node* bullet;
+	PhysicsBody* physicsBody;
+
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		tempDir = Vec2(sin(CC_DEGREES_TO_RADIANS(player->getRotation())), cos(CC_DEGREES_TO_RADIANS(player->getRotation())));
+		tempDir.normalize();
+		bullet = Nodes::CreateNodeUsingTextureCache(spriteNode, "bullet", "bullet.png", Vec2(0.5, 0.5), player->getPosition() + tempDir * 50.f, 1, 0.01f);
+		physicsBody = PhysicsBody::createBox(Size(bullet->getContentSize().width, bullet->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
+		physicsBody->setDynamic(true);
+		physicsBody->setMass(0.01);
+		physicsBody->setVelocity(tempDir * BULLET_SPEED);
+		bullet->addComponent(physicsBody);
+		FetchGO(bullet, GameObject::GO_BULLET);
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
 }
 
 void SpaceshipScene::Update(float interval)
@@ -266,6 +300,49 @@ void SpaceshipScene::Update(float interval)
 
 		// Update Light Location (following main sprite position in terms of screen)
 		GLProgramState::getOrCreateWithGLProgram(proPostProcess)->setUniformVec2("loc", Vec2(spaceship->getPositionX() / visibleSize.width, spaceship->getPositionY() / visibleSize.height));
+	}
+
+	for (auto go : m_goList)
+	{
+		if (go->active)
+		{
+			for (auto go2 : m_goList)
+			{
+				if (!go2->active)
+					continue;
+				if (go == go2)
+					continue;
+				if (go->node->getBoundingBox().intersectsRect(go2->node->getBoundingBox()))
+				{
+					if (go->type == GameObject::GO_BULLET)
+					{
+						if (go2->type == GameObject::GO_BULLET)
+						{
+							go->active = false;
+							go2->active = false;
+							continue;
+						}
+						if (go2->type == GameObject::GO_ASTEROID)
+						{
+							go->active = false;
+							go2->health--;
+							if (go2->health <= 0)
+								go2->active = false;
+							continue;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if (go->node != nullptr)
+			{
+				go->node->removeFromParent();
+				go->node = nullptr;
+				continue;
+			}
+		}
 	}
 
 	// Post Processing
