@@ -110,7 +110,7 @@ bool SpaceshipScene::init()
 	hud->joyStick->Inactive();
 	auto ShootButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.75, visibleSize.height * 0.25f), "Shoot", this);
 	ShootButton->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::ShootButtonEvent, this));
-	hud->addChild(ShootButton);
+	//hud->addChild(ShootButton);
 
 	//Create sprites
 	auto MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mainSprite", "Spaceship.png", Vec2(0.5, 0.5), Vec2(visibleSize.width * .5f, visibleSize.height * .5f), 1, 0.1f);
@@ -122,6 +122,11 @@ bool SpaceshipScene::init()
 	FetchGO(MainSpriteNode, GameObject::GO_PLAYER);
 	player = MainSpriteNode;
 
+	auto thrusters = Nodes::CreateNodeUsingTextureCache(spriteNode, "thrusters", "ThrusterSprites/Thruster1.png", Vec2(0.5, 0.5), MainSpriteNode->getPosition(), 1, 0.1f);
+	string thrusterSprites[5] = { "ThrusterSprites/Thruster1.png","ThrusterSprites/Thruster2.png","ThrusterSprites/Thruster3.png","ThrusterSprites/Thruster4.png","ThrusterSprites/Thruster5.png" };
+	Animate* animateThrusters = CAnimation::createAnimation(thrusterSprites, 5, thrusters->getContentSize().width, thrusters->getContentSize().height, 0.5f);
+	thrusters->runAction(RepeatForever::create(animateThrusters));
+	//player->addChild(thrusters);
 
 	Texture2D *BGtexture = Director::getInstance()->getTextureCache()->addImage("SpaceTexture.jpg");
 	Rect rect = Rect::ZERO;
