@@ -129,6 +129,7 @@ bool SpaceshipScene::init()
 	MainSpriteNode->addComponent(physicsBody);
 	player = FetchGO(MainSpriteNode, GameObject::GO_PLAYER);
 	player->health = 20;
+	player->maxHealth = 20;
 
 	Vec2 randPos;
 	randPos = Vec2(cocos2d::RandomHelper::random_real(0.f, visibleSize.width), cocos2d::RandomHelper::random_real(0.f, visibleSize.height));
@@ -142,6 +143,7 @@ bool SpaceshipScene::init()
 	EnemySprite->addComponent(physicsBody);
 	GameObject* temp = FetchGO(EnemySprite, GameObject::GO_ENEMY);
 	temp->health = 10;
+	temp->maxHealth = 10;
 
 	auto thrusters = Nodes::CreateNodeUsingTextureCache(spriteNode, "thrusters", "ThrusterSprites/Thruster1.png", Vec2(0.5, 0.5), MainSpriteNode->getPosition(), 1, 0.1f);
 	string thrusterSprites[5] = { "ThrusterSprites/Thruster1.png","ThrusterSprites/Thruster2.png","ThrusterSprites/Thruster3.png","ThrusterSprites/Thruster4.png","ThrusterSprites/Thruster5.png" };
@@ -202,6 +204,7 @@ bool SpaceshipScene::init()
 
 		GameObject* temp = FetchGO(asteroid1, GameObject::GO_ASTEROID);
 		temp->health = 5;
+		temp->maxHealth = 5;
 	}
 
 	//Add containers to scene
@@ -492,6 +495,7 @@ void SpaceshipScene::Update(float interval)
 
 		GameObject* temp = FetchGO(asteroid1, GameObject::GO_ASTEROID);
 		temp->health = 5;
+		temp->maxHealth = 5;
 		numOfAsteroids++;
 	}
 	if (enemySpawnTime <= 0)
@@ -508,6 +512,7 @@ void SpaceshipScene::Update(float interval)
 		EnemySprite->addComponent(physicsBody);
 		GameObject* temp = FetchGO(EnemySprite, GameObject::GO_ENEMY);
 		temp->health = 10;
+		temp->maxHealth = 10;
 		numOfEnemies++;
 	}
 
@@ -567,4 +572,5 @@ void SpaceshipScene::RespawnPlayer()
 	MainSpriteNode->addComponent(physicsBody);
 	player = FetchGO(MainSpriteNode, GameObject::GO_PLAYER);
 	player->health = 20;
+	player->maxHealth = 20;
 }
