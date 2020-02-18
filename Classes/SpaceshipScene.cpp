@@ -55,6 +55,8 @@ static void problemLoading(const char* filename)
 // on "init" you need to initialize your instance
 bool SpaceshipScene::init()
 {
+	this->setCameraMask((unsigned short)CameraFlag::USER2, true);
+
 	//////////////////////////////
 	// 1. super init first
 	if (!Scene::initWithPhysics())
@@ -105,9 +107,10 @@ bool SpaceshipScene::init()
 	spriteNode->setName("spriteNode");
 
 	hud = HUDLayer::create();
+	hud->joyStick->Inactive();
 	auto ShootButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.75, visibleSize.height * 0.25f), "Shoot", this);
 	ShootButton->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::ShootButtonEvent, this));
-	//hud->addChild(ShootButton);
+	hud->addChild(ShootButton);
 
 	//Create sprites
 	auto MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mainSprite", "Spaceship.png", Vec2(0.5, 0.5), Vec2(visibleSize.width * .5f, visibleSize.height * .5f), 1, 0.1f);
@@ -119,6 +122,7 @@ bool SpaceshipScene::init()
 	FetchGO(MainSpriteNode, GameObject::GO_PLAYER);
 	player = MainSpriteNode;
 
+
 	Texture2D *BGtexture = Director::getInstance()->getTextureCache()->addImage("SpaceTexture.jpg");
 	Rect rect = Rect::ZERO;
 	rect.size = BGtexture->getContentSize();
@@ -127,7 +131,31 @@ bool SpaceshipScene::init()
 	BG->setPosition(Vec2(visibleSize.width * .5f, visibleSize.height * .5f));
 	BG->setName("BackGround");
 	BG->setScale(visibleSize.width / BG->getContentSize().width, visibleSize.height / BG->getContentSize().height);
-	this->addChild(BG, 0);
+	this->addChild(BG, 1);
+
+
+	auto sprite = Sprite::create("HelloWorld.png");
+	auto spritePos = Vec3(visibleSize.width / 2, visibleSize.width / 2, 0);
+
+	//// position the sprite on the center of the screen
+	sprite->setPosition3D(spritePos);
+	////this is the layer, when adding camera to it, all its children will be affect only when you set the second parameter to true	this->setCameraMask((unsigned short)CameraFlag::USER2, true);
+	//this->setCameraMask((unsigned short)CameraFlag::DEFAULT, true);
+	//// add the sprite as a child to this layer
+	this->addChild(sprite);
+
+
+	//auto deCam = Camera::getDefaultCamera();
+	//deCam->setCameraFlag(CameraFlag::DEFAULT);
+
+	//auto camera = Camera::createOrthographic(visibleSize.width, visibleSize.height, 1.0, 1000);
+	////auto camera = Camera::createOrthographic(visibleSize.width / 2, visibleSize.height /2, 0, 6000);
+	//camera->setCameraFlag(CameraFlag::USER2);
+	////the calling order matters, we should first call setPosition3D, then call lookAt.
+	//camera->setPosition3D(Vec3(visibleSize.width / 2, visibleSize.height /2, 800));
+	//camera->lookAt(player->getPosition3D(), Vec3(0.0, 1.0, 0.0));
+	////camera->setScale(0.5f);
+	//this->addChild(camera);
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -373,6 +401,13 @@ GameObject* SpaceshipScene::FetchGO(cocos2d::Node* node_, GameObject::GAMEOBJECT
 		{
 			go->active = true;
 			go->node = node_;
+			if (go->type != go->GO_BULLET)
+			{
+				auto HealthBar = UI::createLoadingBar("LoadingBarFile.png", cocos2d::ui::LoadingBar::Direction::RIGHT, go->node->getPosition() - Vec2(go->node->getContentSize().width / 7, 0) + Vec2(0, go->node->getContentSize().height / 1.5), this);
+				HealthBar->setPercent((100.0f / go->maxHealth)*go->health);
+				HealthBar->setScale(1);
+				go->node->addChild(HealthBar, 1, "HealthBar");
+			}
 			return go;
 		}
 	}

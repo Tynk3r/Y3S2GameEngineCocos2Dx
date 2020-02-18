@@ -21,6 +21,7 @@ struct GameObject
 	float moveSpeed;
 	StateMachine* sm;
 	int health;
+	int maxHealth;
 
 	GameObject(cocos2d::Node* node_, GAMEOBJECT_TYPE typeValue = GO_ASTEROID);
 	GameObject(GAMEOBJECT_TYPE typeValue = GO_ASTEROID);
