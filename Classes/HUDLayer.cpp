@@ -27,7 +27,6 @@ bool HUDLayer::init() {
 	joyStick = new JoyStick("JoyStickBackGround.png", "JoyStickHandle.png", 0.3);
 	this->addChild(joyStick->joyStickSP, 1);
 	this->addChild(joyStick->backGroundSP,0);
-	joyStick->Inactive();
 
 	//auto _spriteToMove = joyStick->joyStickSP;
 	//_spriteToMove->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
