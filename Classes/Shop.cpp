@@ -70,9 +70,9 @@ bool Shop::init()
 
 	// Settings // Open settings menu
 	//// Settings has 2 sliders, 2 checkbox // BGM, SFX // 2 text for BGM and SFX
-	auto ShopLabel = UI::createTTFLabel("SHOP", Vec2(visibleSize.width / 2, visibleSize.height * 0.90f), "fonts/Marker Felt.ttf", 48, 1, this);
-	auto RemoveAdLabel = UI::createTTFLabel("Remove Ads", Vec2(visibleSize.width * 0.4f , visibleSize.height * 0.70f), "fonts/Marker Felt.ttf", 36, 1, this);
-	auto PremiumLabel = UI::createTTFLabel("Premium Player", Vec2(visibleSize.width * 0.4f, visibleSize.height * 0.5f), "fonts/Marker Felt.ttf", 36, 1, this);
+	auto ShopLabel = UI::createTTFLabel("SHOP", Vec2(visibleSize.width / 2, visibleSize.height * 0.90f), "fonts/MarkerFelt.ttf", 48, 1, this);
+	auto RemoveAdLabel = UI::createTTFLabel("Remove Ads", Vec2(visibleSize.width * 0.4f , visibleSize.height * 0.70f), "fonts/MarkerFelt.ttf", 36, 1, this);
+	auto PremiumLabel = UI::createTTFLabel("Premium Player", Vec2(visibleSize.width * 0.4f, visibleSize.height * 0.5f), "fonts/MarkerFelt.ttf", 36, 1, this);
 
 	auto advertNode = Node::create();
 	advertNode->setName("advert");

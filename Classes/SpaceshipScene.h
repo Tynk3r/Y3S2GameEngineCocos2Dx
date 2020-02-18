@@ -43,12 +43,16 @@ private:
     std::vector<GameObject*> m_goList;
 	float darkness = 1.0f;
     HUDLayer* hud;
-    Node* spriteNode;
-    Node* player;
-
-    GameObject* FetchGO(cocos2d::Node* node_, GameObject::GAMEOBJECT_TYPE type);
+    GameObject* player;
+    int points;
+    float asteroidSpawnTime;
+    float enemySpawnTime;
+    int numOfAsteroids;
+    int numOfEnemies;
 
 public:
+    Node* spriteNode;
+
     static Scene* createScene();
 
     virtual bool init();
@@ -61,7 +65,10 @@ public:
     void menuCloseCallback(cocos2d::Ref* pSender);
 
     void ShootButtonEvent(Ref* sender, ui::Button::TouchEventType type);
-    
+
+    GameObject* FetchGO(cocos2d::Node* node_, GameObject::GAMEOBJECT_TYPE type);
+
+    void RespawnPlayer();
     // implement the "static create()" method manually
     CREATE_FUNC(SpaceshipScene);
 };

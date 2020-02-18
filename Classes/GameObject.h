@@ -12,6 +12,7 @@ struct GameObject
 		GO_ASTEROID,
 		GO_PLAYER,
 		GO_BULLET,
+		GO_ENEMY,
 		GO_TOTAL, //must be last
 	};
 	GAMEOBJECT_TYPE type;

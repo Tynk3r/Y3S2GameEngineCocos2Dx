@@ -52,14 +52,14 @@ bool LoadingScene::init()
     
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
-	label = Label::createWithTTF("Loading Next Scene", "fonts/Marker Felt.ttf", 24);
+	label = Label::createWithTTF("Loading Next Scene", "fonts/MarkerFelt.ttf", 24);
 	if (label != nullptr)
 	{
 		label->setPosition(Vec2((int)visibleSize.width >> 1, (int)visibleSize.height >> 1));
 		this->addChild(label, 1);
 	}
 
-	label = Label::createWithTTF("0%", "fonts/Marker Felt.ttf", 24);
+	label = Label::createWithTTF("0%", "fonts/MarkerFelt.ttf", 24);
 	if (label != nullptr)
 	{
 		label->setPosition(Vec2((int)visibleSize.width >> 1, ((int)visibleSize.height >> 1) - 30));
