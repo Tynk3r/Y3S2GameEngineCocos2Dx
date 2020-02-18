@@ -434,6 +434,8 @@ void SpaceshipScene::Update(float interval)
 						{
 							go->active = false;
 							go2->health--;
+							auto HealthBar = static_cast<cocos2d::ui::LoadingBar*>(go2->node->getChildByName("HealthBar"));
+							HealthBar->setPercent((100.0f / go2->maxHealth) * go2->health);
 							if (go2->health <= 0)
 							{
 								go2->active = false;
@@ -541,6 +543,7 @@ GameObject* SpaceshipScene::FetchGO(cocos2d::Node* node_, GameObject::GAMEOBJECT
 				HealthBar->setPercent((100.0f / go->maxHealth)*go->health);
 				HealthBar->setScale(1);
 				go->node->addChild(HealthBar, 1, "HealthBar");
+
 			}
 			return go;
 		}
