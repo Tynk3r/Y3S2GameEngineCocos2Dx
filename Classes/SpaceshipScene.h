@@ -36,6 +36,13 @@ using namespace cocos2d;
 
 class SpaceshipScene : public cocos2d::Scene
 {
+
+	enum WEAPONS
+	{
+		W_BLASTER,
+		W_ROCKETS
+	};
+
 private:
 	GLProgram* proPostProcess;
 	RenderTexture* rendtex;
@@ -48,15 +55,19 @@ private:
     int points;
     float asteroidSpawnTime;
     float enemySpawnTime;
+    float healthPackSpawnTime;
     int numOfAsteroids;
     int numOfEnemies;
 	int playerHealthPacks = 1;
 	char text[256];
-
 	int numOfHealthpacks;
-
+	WEAPONS currentWeapon;
 public:
     Node* spriteNode;
+	Node* nodeItems;
+
+	Camera* camera2;
+	Camera* camera3;
 
     static Scene* createScene();
 
