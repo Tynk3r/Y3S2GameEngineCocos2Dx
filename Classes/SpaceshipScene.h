@@ -43,12 +43,15 @@ private:
     std::vector<GameObject*> m_goList;
 	float darkness = 1.0f;
     HUDLayer* hud;
+	HUDLayer* deathScreen;
     GameObject* player;
     int points;
     float asteroidSpawnTime;
     float enemySpawnTime;
     int numOfAsteroids;
     int numOfEnemies;
+	int playerHealthPacks = 1;
+	char text[256];
 
 public:
     Node* spriteNode;

@@ -63,7 +63,6 @@ static void problemLoading(const char* filename)
 // on "init" you need to initialize your instance
 bool SpaceshipScene::init()
 {
-	this->setCameraMask((unsigned short)CameraFlag::USER2, true);
 
 	//////////////////////////////
 	// 1. super init first
@@ -109,16 +108,32 @@ bool SpaceshipScene::init()
 
 
 	//Init containers
+	this->setCameraMask((unsigned short)CameraFlag::USER2, true);
+
+
 	auto nodeItems = Node::create();
 	nodeItems->setName("nodeItems");
 	spriteNode = Node::create();
 	spriteNode->setName("spriteNode");
 
 	hud = HUDLayer::create();
+	hud->addJoystickToLayer();
 	hud->joyStick->Inactive();
-	auto ShootButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.75, visibleSize.height * 0.25f), "Shoot", this);
+
+	auto ShootButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.85, visibleSize.height * 0.15f), "Shoot", this);
 	ShootButton->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::ShootButtonEvent, this));
 	hud->addChild(ShootButton);
+
+	auto HealthPack = UI::createButton("HealthPack.png", "HealthPack.png", "HealthPack.png", Vec2(visibleSize.width * 0.85, visibleSize.height * 0.3f), "", this);
+	HealthPack->setScale(0.1f);
+	hud->addChild(HealthPack);
+
+	sprintf(text, "X %d", playerHealthPacks);
+	auto HealthPackCount = UI::createTTFLabel(text, Vec2(visibleSize.width * 0.9, visibleSize.height * 0.3f), "fonts/MarkerFelt.ttf", 24, 1, this);
+	HealthPackCount->setPosition(Vec2(visibleSize.width * 0.9, visibleSize.height * 0.3f));
+	hud->addChild(HealthPackCount, 1 , "HealthPackCount");
+
+	deathScreen = HUDLayer::create();
 
 	//Create sprites
 	auto MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mainSprite", "Spaceship.png", Vec2(0.5, 0.5), Vec2(visibleSize.width * .5f, visibleSize.height * .5f), 1, 0.1f);
@@ -149,7 +164,7 @@ bool SpaceshipScene::init()
 	string thrusterSprites[5] = { "ThrusterSprites/Thruster1.png","ThrusterSprites/Thruster2.png","ThrusterSprites/Thruster3.png","ThrusterSprites/Thruster4.png","ThrusterSprites/Thruster5.png" };
 	Animate* animateThrusters = CAnimation::createAnimation(thrusterSprites, 5, thrusters->getContentSize().width, thrusters->getContentSize().height, 0.5f);
 	thrusters->runAction(RepeatForever::create(animateThrusters));
-	//player->addChild(thrusters);
+	player->node->addChild(thrusters);
 
 	Texture2D* BGtexture = Director::getInstance()->getTextureCache()->addImage("SpaceTexture.png");
 	Rect rect = Rect::ZERO;
@@ -172,27 +187,23 @@ bool SpaceshipScene::init()
 	//// add the sprite as a child to this layer
 	this->addChild(sprite);
 
-
-	//auto deCam = Camera::getDefaultCamera();
-	//deCam->setCameraFlag(CameraFlag::DEFAULT);
-
-	//auto camera = Camera::createOrthographic(visibleSize.width, visibleSize.height, 1.0, 1000);
-	////auto camera = Camera::createOrthographic(visibleSize.width / 2, visibleSize.height /2, 0, 6000);
-	//camera->setCameraFlag(CameraFlag::USER2);
-	////the calling order matters, we should first call setPosition3D, then call lookAt.
-	//camera->setPosition3D(Vec3(visibleSize.width / 2, visibleSize.height /2, 800));
-	//camera->lookAt(player->getPosition3D(), Vec3(0.0, 1.0, 0.0));
-	////camera->setScale(0.5f);
-	//this->addChild(camera);
+	auto camera = Camera::createOrthographic(visibleSize.width, visibleSize.height, 1.0, 1000);
+	//auto camera = Camera::createOrthographic(visibleSize.width / 2, visibleSize.height /2, 0, 6000);
+	camera->setCameraFlag(CameraFlag::USER2);
+	//the calling order matters, we should first call setPosition3D, then call lookAt.
+	camera->setPosition3D(Vec3(visibleSize.width / 2, visibleSize.height /2, 800));
+	camera->lookAt(player->node->getPosition3D(), Vec3(0.0, 1.0, 0.0));
+	//camera->setScale(0.5f);
+	this->addChild(camera);
 
 	for (int i = 0; i < 3; i++)
 	{
 		randPos = Vec2(cocos2d::RandomHelper::random_real(0.f, visibleSize.width), cocos2d::RandomHelper::random_real(0.f, visibleSize.height));
 		while((player->node->getPosition() - randPos).length() < OBJECTS_DISTANCE_FROM_PLAYER)
 			randPos = Vec2(cocos2d::RandomHelper::random_real(0.f, visibleSize.width), cocos2d::RandomHelper::random_real(0.f, visibleSize.height));
-		auto asteroid1 = Nodes::CreateNodeUsingTextureCache(spriteNode, "asteroid1", "Asteroids/asteroid_01.png", Vec2(0.5, 0.5), randPos, 1);
+		auto asteroid1 = Nodes::CreateNodeUsingTextureCache(spriteNode, "asteroid1", "Asteroids/asteroid_01.png", Vec2(0.5, 0.5), randPos, 1, 0.5f);
 		string asteroidSprites[4] = { "Asteroids/asteroid_01.png","Asteroids/asteroid_02.png","Asteroids/asteroid_03.png","Asteroids/asteroid_04.png" };
-		Animate* animateAsteroids = CAnimation::createAnimation(asteroidSprites, 4, 81, 101, 0.5f);
+		Animate* animateAsteroids = CAnimation::createAnimation(asteroidSprites, 4, asteroid1->getContentSize().width, asteroid1->getContentSize().width, 0.5f);
 		asteroid1->runAction(RepeatForever::create(animateAsteroids));
 	
 		//Create static PhysicsBody
@@ -483,7 +494,7 @@ void SpaceshipScene::Update(float interval)
 		Vec2 randPos = Vec2(cocos2d::RandomHelper::random_real(0.f, visibleSize.width), cocos2d::RandomHelper::random_real(0.f, visibleSize.height));
 		while ((player->node->getPosition() - randPos).length() < OBJECTS_DISTANCE_FROM_PLAYER)
 			randPos = Vec2(cocos2d::RandomHelper::random_real(0.f, visibleSize.width), cocos2d::RandomHelper::random_real(0.f, visibleSize.height));
-		auto asteroid1 = Nodes::CreateNodeUsingTextureCache(spriteNode, "asteroid1", "Asteroids/asteroid_01.png", Vec2(0.5, 0.5), randPos, 1);
+		auto asteroid1 = Nodes::CreateNodeUsingTextureCache(spriteNode, "asteroid1", "Asteroids/asteroid_01.png", Vec2(0.5, 0.5), randPos, 1 , 0.5f);
 		string asteroidSprites[4] = { "Asteroids/asteroid_01.png","Asteroids/asteroid_02.png","Asteroids/asteroid_03.png","Asteroids/asteroid_04.png" };
 		Animate* animateAsteroids = CAnimation::createAnimation(asteroidSprites, 4, 81, 101, 0.5f);
 		asteroid1->runAction(RepeatForever::create(animateAsteroids));
@@ -539,10 +550,18 @@ GameObject* SpaceshipScene::FetchGO(cocos2d::Node* node_, GameObject::GAMEOBJECT
 			go->node = node_;
 			if (go->type != go->GO_BULLET)
 			{
-				auto HealthBar = UI::createLoadingBar("LoadingBarFile.png", cocos2d::ui::LoadingBar::Direction::RIGHT, go->node->getPosition() - Vec2(go->node->getContentSize().width / 7, 0) + Vec2(0, go->node->getContentSize().height / 1.5), this);
-				HealthBar->setPercent((100.0f / go->maxHealth)*go->health);
-				HealthBar->setScale(1);
-				go->node->addChild(HealthBar, 1, "HealthBar");
+				if (go->type == go->GO_PLAYER)
+				{
+					auto HealthBar = UI::createLoadingBar("PlayerHealthBar.png", cocos2d::ui::LoadingBar::Direction::LEFT, Vec2(0,0), this);
+					HealthBar->setPercent((100.0f / go->maxHealth)*go->health);
+					go->node->addChild(HealthBar, 1, "HealthBar");
+				}
+				else
+				{
+					auto HealthBar = UI::createLoadingBar("EnemyHealthBar.png", cocos2d::ui::LoadingBar::Direction::LEFT, Vec2(0, 0), this);
+					HealthBar->setPercent((100.0f / go->maxHealth)*go->health);
+					go->node->addChild(HealthBar, 1, "HealthBar");
+				}
 
 			}
 			return go;

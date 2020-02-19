@@ -1,5 +1,4 @@
 #include "UI.h"
-
 USING_NS_CC;
 
 UI::UI()
@@ -90,6 +89,7 @@ cocos2d::ui::LoadingBar * UI::createLoadingBar(const::std::string LoadingBarText
 {
 	auto loadingBar = ui::LoadingBar::create(LoadingBarTexture);
 	loadingBar->setDirection(LoadingBarDirection);
+	loadingBar->setAnchorPoint(Vec2(0, 0));
 	loadingBar->setPosition(position);
 	scene->addChild(loadingBar);
 	return loadingBar;
@@ -105,6 +105,4 @@ cocos2d::ui::TextField * UI::createTextField(const::std::string PlaceHolderText,
 	scene->addChild(textField);
 	return textField;
 }
-
-
 

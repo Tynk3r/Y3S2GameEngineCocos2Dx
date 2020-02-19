@@ -24,9 +24,14 @@ bool HUDLayer::init() {
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 
+	return true;
+}
+
+void HUDLayer::addJoystickToLayer()
+{
 	joyStick = new JoyStick("JoyStickBackGround.png", "JoyStickHandle.png", 0.3);
 	this->addChild(joyStick->joyStickSP, 1);
-	this->addChild(joyStick->backGroundSP,0);
+	this->addChild(joyStick->backGroundSP, 0);
 
 	//auto _spriteToMove = joyStick->joyStickSP;
 	//_spriteToMove->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
@@ -38,8 +43,6 @@ bool HUDLayer::init() {
 	listener->onTouchEnded = CC_CALLBACK_2(HUDLayer::onTouchEnded, this);
 
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-
-	return true;
 }
 
 
@@ -50,22 +53,24 @@ bool HUDLayer::onTouchBegan(CCTouch * pTouch, CCEvent * pEvent)
 	Point touchLoc = pTouch->getLocationInView();
 	touchLoc = cocos2d::CCDirector::sharedDirector()->convertToGL(touchLoc);
 
-	if (touchLoc.x < visibleSize.width * 0.5)
+	if (joyStick != NULL)
 	{
-		joyStick->Active();
-		
-		joyStick->backGroundSP->setPosition(touchLoc);
-		joyStick->joyStickSP->setPosition(joyStick->backGroundSP->getPosition());
-		joyStick->centerPoint = joyStick->backGroundSP->getPosition();
-		joyStick->currentPoint = touchLoc;
 
-		if (joyStick->joyStickSP->getBoundingBox().containsPoint(touchLoc))
+		if (touchLoc.x < visibleSize.width * 0.5)
 		{
-			return true;
+			joyStick->Active();
+
+			joyStick->backGroundSP->setPosition(touchLoc);
+			joyStick->joyStickSP->setPosition(joyStick->backGroundSP->getPosition());
+			joyStick->centerPoint = joyStick->backGroundSP->getPosition();
+			joyStick->currentPoint = touchLoc;
+
+			if (joyStick->joyStickSP->getBoundingBox().containsPoint(touchLoc))
+			{
+				return true;
+			}
 		}
 	}
-
-
 	return false;
 }
 
@@ -73,20 +78,25 @@ void HUDLayer::onTouchMoved(CCTouch * pTouch, CCEvent * pEvent)
 {
 	Point touchLoc = pTouch->getLocationInView();
 	touchLoc = cocos2d::CCDirector::sharedDirector()->convertToGL(touchLoc);
-
-	if (ccpDistance(touchLoc, joyStick->centerPoint) > joyStick->radius)
+	if (joyStick != NULL)
 	{
-		joyStick->currentPoint = ccpAdd(joyStick->centerPoint, ccpMult(ccpNormalize(ccpSub(touchLoc, joyStick->centerPoint)), joyStick->radius));
-		joyStick->joyStickSP->setPosition(joyStick->currentPoint);
-	}
-	else
-	{
-		joyStick->currentPoint = touchLoc;
-		joyStick->joyStickSP->setPosition(joyStick->currentPoint);
+		if (ccpDistance(touchLoc, joyStick->centerPoint) > joyStick->radius)
+		{
+			joyStick->currentPoint = ccpAdd(joyStick->centerPoint, ccpMult(ccpNormalize(ccpSub(touchLoc, joyStick->centerPoint)), joyStick->radius));
+			joyStick->joyStickSP->setPosition(joyStick->currentPoint);
+		}
+		else
+		{
+			joyStick->currentPoint = touchLoc;
+			joyStick->joyStickSP->setPosition(joyStick->currentPoint);
+		}
 	}
 }
 
 void HUDLayer::onTouchEnded(CCTouch * pTouch, CCEvent * pEvent)
 {
-	joyStick->Inactive();
+	if (joyStick != NULL)
+	{
+		joyStick->Inactive();
+	}
 }
