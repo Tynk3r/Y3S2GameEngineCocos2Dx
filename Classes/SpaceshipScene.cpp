@@ -338,7 +338,7 @@ void SpaceshipScene::ShootButtonEvent(Ref* sender, cocos2d::ui::Button::TouchEve
 		case W_ROCKETS:
 			tempDir = Vec2(sin(CC_DEGREES_TO_RADIANS(player->node->getRotation())), cos(CC_DEGREES_TO_RADIANS(player->node->getRotation())));
 			tempDir.normalize();
-			bullet = Nodes::CreateNodeUsingTextureCache(spriteNode, "missile", "missile.png", Vec2(0.5, 0.5), player->node->getPosition() + tempDir * 85.f, 1, 0.01f);
+			bullet = Nodes::CreateNodeUsingTextureCache(spriteNode, "missile", "missile.png", Vec2(0.5, 0.5), player->node->getPosition() + tempDir * 85.f, 1, 0.05f);
 			physicsBody = PhysicsBody::createBox(Size(bullet->getContentSize().width, bullet->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
 			physicsBody->setDynamic(true);
 			physicsBody->setMass(1);
@@ -432,7 +432,7 @@ void SpaceshipScene::Update(float interval)
 		{
 			if (go->active)
 			{
-				if (go->type == GameObject::GO_BULLET)
+				if (go->type == GameObject::GO_BULLET || go->type == GameObject::GO_MISSILE)
 				{
 					if (go->node->getPosition().x > visibleSize.width + (go->node->getContentSize().width * go->node->getScale()))
 						go->active = false;
@@ -573,10 +573,10 @@ void SpaceshipScene::Update(float interval)
 							go2->active = false;
 							continue;
 						}
-						if (go2->type == GameObject::GO_ASTEROID || go2->type == GameObject::GO_ENEMY || go2->type == GameObject::GO_PLAYER)
+						if (go2->type == GameObject::GO_ASTEROID || go2->type == GameObject::GO_ENEMY)
 						{
 							go->active = false;
-							auto explosion = Nodes::CreateNodeUsingTextureCache(spriteNode, "explosion", "explosion.png", Vec2(0.5, 0.5), go2->node->getPosition(), 1, 0.5f);
+							auto explosion = Nodes::CreateNodeUsingTextureCache(spriteNode, "explosion", "explosion.png", Vec2(0.5, 0.5), go2->node->getPosition(), 1, 0.2f);
 							auto physicsBody = PhysicsBody::createBox(Size(explosion->getContentSize().width, explosion->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
 							physicsBody->setDynamic(true);
 							physicsBody->setVelocityLimit(SPEED_LIMIT);
@@ -589,7 +589,7 @@ void SpaceshipScene::Update(float interval)
 					else if (go->type == GameObject::GO_EXPLOSION)
 					{
 
-						if (go2->type == GameObject::GO_ASTEROID || go2->type == GameObject::GO_ENEMY || go2->type == GameObject::GO_PLAYER)
+						if (go2->type == GameObject::GO_ASTEROID || go2->type == GameObject::GO_ENEMY)
 						{
 							go->active = false;
 							go2->health -= 10;
