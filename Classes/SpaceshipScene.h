@@ -73,8 +73,11 @@ public:
 
     GameObject* FetchGO(cocos2d::Node* node_, GameObject::GAMEOBJECT_TYPE type);
 
-    void RespawnPlayer();
-	void UseHealthpack();
+	void RespawnPlayer(Ref * sender, cocos2d::ui::Button::TouchEventType type);
+
+	void UseHealthpack(Ref * sender, cocos2d::ui::Button::TouchEventType type);
+
+	void BackToMainMenu(Ref * sender, cocos2d::ui::Button::TouchEventType type);
 
     // implement the "static create()" method manually
     CREATE_FUNC(SpaceshipScene);

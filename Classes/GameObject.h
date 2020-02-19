@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "AI/StateMachine.h"
+#include "ui/CocosGUI.h"
 
 struct GameObject
 {
@@ -24,6 +25,7 @@ struct GameObject
 	StateMachine* sm;
 	int health;
 	int maxHealth;
+	cocos2d::ui::LoadingBar* healthBarNode;
 
 	GameObject(cocos2d::Node* node_, GAMEOBJECT_TYPE typeValue = GO_ASTEROID);
 	GameObject(GAMEOBJECT_TYPE typeValue = GO_ASTEROID);

@@ -45,6 +45,7 @@
 #include "AI/StateEnemyIdle.h"
 #include "AI/StateEnemyAttack.h"
 #include "AI/StateEnemyRetreat.h"
+#include "MainMenuScene.h"
 
 USING_NS_CC;
 
@@ -116,24 +117,46 @@ bool SpaceshipScene::init()
 	spriteNode = Node::create();
 	spriteNode->setName("spriteNode");
 
+	// Creation of player HUD
 	hud = HUDLayer::create();
 	hud->addJoystickToLayer();
 	hud->joyStick->Inactive();
 
-	auto ShootButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.85, visibleSize.height * 0.15f), "Shoot", this);
+	auto ShootButton = UI::createButton("Shoot.png", "ShootPressed.png", "ShootPressed.png", Vec2(visibleSize.width * 0.85, visibleSize.height * 0.15f), "", this);
 	ShootButton->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::ShootButtonEvent, this));
-	//hud->addChild(ShootButton);
+	ShootButton->setScale(0.5);
+	hud->addChild(ShootButton);
 
-	auto HealthPack = UI::createButton("HealthPack.png", "HealthPack.png", "HealthPack.png", Vec2(visibleSize.width * 0.85, visibleSize.height * 0.3f), "", this);
-	HealthPack->setScale(0.1f);
-	hud->addChild(HealthPack);
+	auto HealthPackButton = UI::createButton("HealthPack.png", "HealthPackPressed.png", "HealthPackDisabled.png", Vec2(visibleSize.width * 0.85, visibleSize.height * 0.3f), "", this);
+	HealthPackButton->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::UseHealthpack, this));
+	HealthPackButton->setScale(0.1f);
+	hud->addChild(HealthPackButton, 1, "HealthPackButton");
 
 	sprintf(text, "X %d", playerHealthPacks);
 	auto HealthPackCount = UI::createTTFLabel(text, Vec2(visibleSize.width * 0.9, visibleSize.height * 0.3f), "fonts/MarkerFelt.ttf", 24, 1, this);
-	HealthPackCount->setPosition(Vec2(visibleSize.width * 0.9, visibleSize.height * 0.3f));
-	hud->addChild(HealthPackCount, 1 , "HealthPackCount");
+	hud->addChild(HealthPackCount, 1 , "PlayerHealthPackCount");
 
+	sprintf(text, "Points: %d", points);
+	auto pointCount = UI::createTTFLabel(text, Vec2(visibleSize.width * 0.5, visibleSize.height * 0.95f), "fonts/MarkerFelt.ttf", 24, 1, this);
+	hud->addChild(pointCount, 1, "pointCount");
+
+
+	// Create a layer for player when they die
 	deathScreen = HUDLayer::create();
+	auto DeadScreensprite = Sprite::create("DeathScreen.png");
+	DeadScreensprite->setAnchorPoint(Vec2(0.5f, 0.5f));
+	DeadScreensprite->setPosition(Vec2(visibleSize.width * .5f, visibleSize.height * .5f));
+	DeadScreensprite->setScale(visibleSize.width / DeadScreensprite->getContentSize().width, visibleSize.height / DeadScreensprite->getContentSize().height);
+	deathScreen->addChild(DeadScreensprite);
+
+	auto BackToMainMenuButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.5, visibleSize.height * 0.15), "Back To MainMenu", this);
+	BackToMainMenuButton->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::BackToMainMenu, this));
+	deathScreen->addChild(BackToMainMenuButton);
+
+	auto RespawnButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.5, visibleSize.height * 0.35), "Try Again?", this);
+	RespawnButton->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::RespawnPlayer, this));
+	deathScreen->addChild(RespawnButton);
+	deathScreen->setVisible(false);
 
 	//Create sprites
 	auto MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mainSprite", "Spaceship.png", Vec2(0.5, 0.5), Vec2(visibleSize.width * .5f, visibleSize.height * .5f), 1, 0.1f);
@@ -174,7 +197,7 @@ bool SpaceshipScene::init()
 	BG->setPosition(Vec2(visibleSize.width * .5f, visibleSize.height * .5f));
 	BG->setName("BackGround");
 	BG->setScale(visibleSize.width / BG->getContentSize().width, visibleSize.height / BG->getContentSize().height);
-	//this->addChild(BG, 1);
+	this->addChild(BG, 1);
 
 
 	auto sprite = Sprite::create("HelloWorld.png");
@@ -185,7 +208,7 @@ bool SpaceshipScene::init()
 	////this is the layer, when adding camera to it, all its children will be affect only when you set the second parameter to true	this->setCameraMask((unsigned short)CameraFlag::USER2, true);
 	//this->setCameraMask((unsigned short)CameraFlag::DEFAULT, true);
 	//// add the sprite as a child to this layer
-	//this->addChild(sprite);
+	this->addChild(sprite);
 
 	auto camera = Camera::createOrthographic(visibleSize.width, visibleSize.height, 1.0, 1000);
 	//auto camera = Camera::createOrthographic(visibleSize.width / 2, visibleSize.height /2, 0, 6000);
@@ -222,6 +245,7 @@ bool SpaceshipScene::init()
 	this->addChild(spriteNode, 1);
 	this->addChild(nodeItems, 1);
 	this->addChild(hud,2);
+	this->addChild(deathScreen, 3);
 
 	//Creating Inputs
 	InputManager::GetInstance()->SetListeners(this);
@@ -445,23 +469,34 @@ void SpaceshipScene::Update(float interval)
 						{
 							go->active = false;
 							go2->health--;
-							//auto HealthBar = static_cast<cocos2d::ui::LoadingBar*>(go2->node->getChildByName("HealthBar"));
-							//HealthBar->setPercent((100.0f / go2->maxHealth) * go2->health);
+							auto HealthBar = static_cast<cocos2d::ui::LoadingBar*>(go2->node->getChildByName("HealthBar"));
+							HealthBar->setPercent((100.0f / go2->maxHealth) * go2->health);
 							if (go2->health <= 0)
 							{
 								go2->active = false;
 								if (go2->type == GameObject::GO_ENEMY)
 								{
 									points += 10;
+									sprintf(text, "Points: %d", points);
+									auto pointsText = static_cast<cocos2d::Label*>(hud->getChildByName("pointCount"));
+									pointsText->setString(text);
 									numOfEnemies--;
 								}
 								if (go2->type == GameObject::GO_ASTEROID)
 								{
 									points += 2;
+									sprintf(text, "Points: %d", points);
+									auto pointsText = static_cast<cocos2d::Label*>(hud->getChildByName("pointCount"));
+									pointsText->setString(text);
 									numOfAsteroids--;
 								}
 								if (go2->type == GameObject::GO_PLAYER)
+								{
 									points -= 25;
+									sprintf(text, "Points: %d", points);
+									auto pointsText = static_cast<cocos2d::Label*>(hud->getChildByName("pointCount"));
+									pointsText->setString(text);
+								}
 							}
 
 							continue;
@@ -487,8 +522,10 @@ void SpaceshipScene::Update(float interval)
 			{
 				go->node->removeFromParent();
 				go->node = nullptr;
-				if(go->type == GameObject::GO_PLAYER)
-					RespawnPlayer();
+				if (go->type == GameObject::GO_PLAYER)
+				{
+					deathScreen->setVisible(true);
+				}
 				continue;
 			}
 		}
@@ -563,20 +600,28 @@ GameObject* SpaceshipScene::FetchGO(cocos2d::Node* node_, GameObject::GAMEOBJECT
 			{
 				if (go->type == go->GO_PLAYER)
 				{
-					auto HealthBar = UI::createLoadingBar("PlayerHealthBar.png", cocos2d::ui::LoadingBar::Direction::LEFT, Vec2(0,0), this);
+					auto HealthBar = UI::createLoadingBar("PlayerHealthBar.png", cocos2d::ui::LoadingBar::Direction::LEFT, Vec2(go->node->getContentSize().width / 4.0f,0), this);
 					HealthBar->setPercent((100.0f / go->maxHealth)*go->health);
+					HealthBar->setScale(2);
+					HealthBar->setScaleY(3);
 					go->node->addChild(HealthBar, 1, "HealthBar");
 				}
-				else
+				else if(go->type == go->GO_ENEMY)
 				{
-					auto HealthBar = UI::createLoadingBar("EnemyHealthBar.png", cocos2d::ui::LoadingBar::Direction::LEFT, Vec2(0, 0), this);
+					auto HealthBar = UI::createLoadingBar("EnemyHealthBar.png", cocos2d::ui::LoadingBar::Direction::LEFT, Vec2(go->node->getContentSize().width / 4.0f, 0), this);
 					HealthBar->setPercent((100.0f / go->maxHealth)*go->health);
+					HealthBar->setScale(2);
+					HealthBar->setScaleY(3);
 					go->node->addChild(HealthBar, 1, "HealthBar");
 				}
-				//auto HealthBar = UI::createLoadingBar("LoadingBarFile.png", cocos2d::ui::LoadingBar::Direction::RIGHT, go->node->getPosition() - Vec2(go->node->getContentSize().width / 7, 0) + Vec2(0, go->node->getContentSize().height / 1.5), this);
-				//HealthBar->setPercent((100.0f / go->maxHealth)*go->health);
-				//HealthBar->setScale(1);
-				//go->node->addChild(HealthBar, 1, "HealthBar");
+				else if (go->type == go->GO_ASTEROID)
+				{
+					auto HealthBar = UI::createLoadingBar("EnemyHealthBar.png", cocos2d::ui::LoadingBar::Direction::LEFT, Vec2(go->node->getContentSize().width / 4.0f, 0), this);
+					HealthBar->setPercent((100.0f / go->maxHealth)*go->health);
+					HealthBar->setScale(0.2);
+					HealthBar->setScaleY(0.6);
+					go->node->addChild(HealthBar, 1, "HealthBar");
+				}
 
 			}
 			return go;
@@ -598,24 +643,82 @@ GameObject* SpaceshipScene::FetchGO(cocos2d::Node* node_, GameObject::GAMEOBJECT
 	return FetchGO(node_, type);
 }
 
-void SpaceshipScene::RespawnPlayer()
+void SpaceshipScene::RespawnPlayer(Ref* sender, cocos2d::ui::Button::TouchEventType type)
 {
+	Node* MainSpriteNode;
+	PhysicsBody* physicsBody;
+	cocos2d::ui::LoadingBar* HealthBar;
 	auto visibleSize = Director::getInstance()->getVisibleSize();
-	auto MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mainSprite", "Spaceship.png", Vec2(0.5, 0.5), Vec2(visibleSize.width * .5f, visibleSize.height * .5f), 1, 0.1f);
-	auto physicsBody = PhysicsBody::createBox(Size(MainSpriteNode->getContentSize().width, MainSpriteNode->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
-	physicsBody->setDynamic(true);
-	physicsBody->setVelocityLimit(SPEED_LIMIT);
-	physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
-	MainSpriteNode->addComponent(physicsBody);
-	player = FetchGO(MainSpriteNode, GameObject::GO_PLAYER);
-	player->health = 20;
-	player->maxHealth = 20;
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mainSprite", "Spaceship.png", Vec2(0.5, 0.5), Vec2(visibleSize.width * .5f, visibleSize.height * .5f), 1, 0.1f);
+		physicsBody = PhysicsBody::createBox(Size(MainSpriteNode->getContentSize().width, MainSpriteNode->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
+		physicsBody->setDynamic(true);
+		physicsBody->setVelocityLimit(SPEED_LIMIT);
+		physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
+		MainSpriteNode->addComponent(physicsBody);
+		player = FetchGO(MainSpriteNode, GameObject::GO_PLAYER);
+		player->health = 20;
+		player->maxHealth = 20;
+		HealthBar = static_cast<cocos2d::ui::LoadingBar*>(player->node->getChildByName("HealthBar"));
+		HealthBar->setPercent((100.0f / player->maxHealth) * player->health);
+		deathScreen->setVisible(false);
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
 }
 
-void SpaceshipScene::UseHealthpack()
+void SpaceshipScene::UseHealthpack(Ref* sender, cocos2d::ui::Button::TouchEventType type)
 {
-	if (player->health < player->maxHealth)
+	if (player->health < player->maxHealth && playerHealthPacks > 0)
 	{
+		playerHealthPacks--;
+		//if (playerHealthPacks == 0)
+		//{
+		//	auto HealthPackButton = static_cast<cocos2d::ui::Button*>(hud->getChildByName("PlayerHealthPackCount"));
+		//	HealthPackButton->setEnabled(false);
+		//}
 		player->health = player->maxHealth;
+
+		sprintf(text, "X %d", playerHealthPacks);
+		auto HealthPackCount = static_cast<cocos2d::Label*>(hud->getChildByName("PlayerHealthPackCount"));
+		HealthPackCount->setString(text);
+
+		auto HealthBar = static_cast<cocos2d::ui::LoadingBar*>(player->node->getChildByName("HealthBar"));
+		HealthBar->setPercent((100.0f / player->maxHealth) * player->health);
+	}
+}
+
+void SpaceshipScene::BackToMainMenu(Ref* sender, cocos2d::ui::Button::TouchEventType type)
+{
+	std::vector<std::string> tempResources;
+	MainMenuScene* tempScene = new MainMenuScene(); // So Init isn't called immediately
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		tempResources.push_back("Blue_Back1.png");
+		tempResources.push_back("Blue_Front1.png");
+		tempResources.push_back("Blue_Front2.png");
+		tempResources.push_back("Blue_Front3.png");
+		tempResources.push_back("ZigzagGrass_Mud_Round.png");
+
+		SceneManager::GetInstance()->ReplaceScene(tempScene, tempResources);
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
 	}
 }

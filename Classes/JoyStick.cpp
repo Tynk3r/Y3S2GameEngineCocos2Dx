@@ -29,14 +29,14 @@ JoyStick::JoyStick(std::string backGroundFile, std::string joyStickFile, float s
 	backGroundSP = backGroundframe;
 	backGroundSP->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 	backGroundSP->setName("BackGroundJoyStick");
-	backGroundSP->setScale(scale);
+	backGroundSP->setScale(scale * 2);
 
 	joyStickSP = joyStickframe;
 	joyStickSP->setPosition(backGroundSP->getPosition());
 	joyStickSP->setName("JoyStick");
 	joyStickSP->setScale(scale);
 
-	radius = backGroundrect.size.height * 0.5f * scale;
+	radius = backGroundSP->getContentSize().width * 0.3f;
 }
 
 void JoyStick::Active()
