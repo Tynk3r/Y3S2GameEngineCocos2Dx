@@ -426,7 +426,7 @@ void SpaceshipScene::Update(float interval)
 		{
 			if (go->active)
 			{
-				if (go->type == GameObject::GO_BULLET)
+				if (go->type == GameObject::GO_BULLET || go->type == GameObject::GO_MISSILE)
 				{
 					if (go->node->getPosition().x > visibleSize.width + (go->node->getContentSize().width * go->node->getScale()))
 						go->active = false;
