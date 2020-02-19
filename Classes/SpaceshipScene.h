@@ -39,8 +39,9 @@ class SpaceshipScene : public cocos2d::Scene
 
 	enum WEAPONS
 	{
-		W_BLASTER,
-		W_ROCKETS
+		W_BLASTER = 0,
+		W_PLASMABLASTER = 1,
+		W_ROCKETS = 2
 	};
 
 private:
@@ -90,6 +91,7 @@ public:
 
 	void BackToMainMenu(Ref * sender, cocos2d::ui::Button::TouchEventType type);
 
+	void SwapWeapon(Ref * sender, cocos2d::ui::Button::TouchEventType type);
     // implement the "static create()" method manually
     CREATE_FUNC(SpaceshipScene);
 };
