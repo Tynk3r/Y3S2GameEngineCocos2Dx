@@ -57,6 +57,10 @@ private:
 
 public:
     Node* spriteNode;
+	Node* nodeItems;
+
+	Camera* camera2;
+	Camera* camera3;
 
     static Scene* createScene();
 

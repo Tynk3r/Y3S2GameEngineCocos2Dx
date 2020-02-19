@@ -109,10 +109,8 @@ bool SpaceshipScene::init()
 
 
 	//Init containers
-	this->setCameraMask((unsigned short)CameraFlag::USER2, true);
 
-
-	auto nodeItems = Node::create();
+	nodeItems = Node::create();
 	nodeItems->setName("nodeItems");
 	spriteNode = Node::create();
 	spriteNode->setName("spriteNode");
@@ -199,32 +197,12 @@ bool SpaceshipScene::init()
 	BG->setScale(visibleSize.width / BG->getContentSize().width, visibleSize.height / BG->getContentSize().height);
 	this->addChild(BG, 1);
 
-
-	auto sprite = Sprite::create("HelloWorld.png");
-	auto spritePos = Vec3(visibleSize.width / 2, visibleSize.width / 2, 0);
-
-	//// position the sprite on the center of the screen
-	sprite->setPosition3D(spritePos);
-	////this is the layer, when adding camera to it, all its children will be affect only when you set the second parameter to true	this->setCameraMask((unsigned short)CameraFlag::USER2, true);
-	//this->setCameraMask((unsigned short)CameraFlag::DEFAULT, true);
-	//// add the sprite as a child to this layer
-	this->addChild(sprite);
-
-	auto camera = Camera::createOrthographic(visibleSize.width, visibleSize.height, 1.0, 1000);
-	//auto camera = Camera::createOrthographic(visibleSize.width / 2, visibleSize.height /2, 0, 6000);
-	camera->setCameraFlag(CameraFlag::USER2);
-	//the calling order matters, we should first call setPosition3D, then call lookAt.
-	camera->setPosition3D(Vec3(visibleSize.width / 2, visibleSize.height /2, 800));
-	camera->lookAt(player->node->getPosition3D(), Vec3(0.0, 1.0, 0.0));
-	//camera->setScale(0.5f);
-	this->addChild(camera);
-
 	for (int i = 0; i < 3; i++)
 	{
 		randPos = Vec2(cocos2d::RandomHelper::random_real(0.f, visibleSize.width), cocos2d::RandomHelper::random_real(0.f, visibleSize.height));
 		while((player->node->getPosition() - randPos).length() < OBJECTS_DISTANCE_FROM_PLAYER)
 			randPos = Vec2(cocos2d::RandomHelper::random_real(0.f, visibleSize.width), cocos2d::RandomHelper::random_real(0.f, visibleSize.height));
-		auto asteroid1 = Nodes::CreateNodeUsingTextureCache(spriteNode, "asteroid1", "Asteroids/asteroid_01.png", Vec2(0.5, 0.5), randPos, 1, 0.5f);
+		auto asteroid1 = Nodes::CreateNodeUsingTextureCache(nodeItems, "asteroid1", "Asteroids/asteroid_01.png", Vec2(0.5, 0.5), randPos, 1, 0.5f);
 		string asteroidSprites[4] = { "Asteroids/asteroid_01.png","Asteroids/asteroid_02.png","Asteroids/asteroid_03.png","Asteroids/asteroid_04.png" };
 		Animate* animateAsteroids = CAnimation::createAnimation(asteroidSprites, 4, asteroid1->getContentSize().width, asteroid1->getContentSize().width, 0.5f);
 		asteroid1->runAction(RepeatForever::create(animateAsteroids));
@@ -240,6 +218,37 @@ bool SpaceshipScene::init()
 		temp->health = 5;
 		temp->maxHealth = 5;
 	}
+
+	auto sprite = Sprite::create("HelloWorld.png");
+	auto spritePos = Vec3(visibleSize.width / 2 + origin.x,
+		visibleSize.height / 2 + origin.y,
+		0);
+
+	//// position the sprite on the center of the screen
+	//sprite->setPosition3D(spritePos);
+	////this is the layer, when adding camera to it, all its children will be affect only when you set the second parameter to true
+	//this->setCameraMask((unsigned short)CameraFlag::USER2, true);
+	//// add the sprite as a child to this layer
+	//this->addChild(sprite);
+
+	// New camera(User2)
+	camera2 = Camera::createPerspective(60, (float)visibleSize.width / visibleSize.height, 1.0, 1000);
+	camera2->setCameraFlag(CameraFlag::USER2);
+	camera2->setPosition3D(spritePos + Vec3(0, 0, 800));
+	camera2->lookAt(spritePos, Vec3(0.0, 1.0, 0.0));
+	this->addChild(camera2);
+	camera2->setVisible(true);
+
+	camera3 = Camera::createPerspective(60, (float)visibleSize.width / visibleSize.height, 1.0, 1000);
+	camera3->setCameraFlag(CameraFlag::USER3);
+	camera3->setPosition3D(spritePos + Vec3(0, 0, 800));
+	camera3->lookAt(spritePos, Vec3(0.0, 1.0, 0.0));
+	this->addChild(camera3);
+	camera3->setVisible(true);
+
+
+	spriteNode->setCameraMask((unsigned short)CameraFlag::USER2);
+	nodeItems->setCameraMask((unsigned short)CameraFlag::USER3);
 
 	//Add containers to scene
 	this->addChild(spriteNode, 1);
@@ -542,7 +551,7 @@ void SpaceshipScene::Update(float interval)
 		Vec2 randPos = Vec2(cocos2d::RandomHelper::random_real(0.f, visibleSize.width), cocos2d::RandomHelper::random_real(0.f, visibleSize.height));
 		while ((player->node->getPosition() - randPos).length() < OBJECTS_DISTANCE_FROM_PLAYER)
 			randPos = Vec2(cocos2d::RandomHelper::random_real(0.f, visibleSize.width), cocos2d::RandomHelper::random_real(0.f, visibleSize.height));
-		auto asteroid1 = Nodes::CreateNodeUsingTextureCache(spriteNode, "asteroid1", "Asteroids/asteroid_01.png", Vec2(0.5, 0.5), randPos, 1 , 0.5f);
+		auto asteroid1 = Nodes::CreateNodeUsingTextureCache(nodeItems, "asteroid1", "Asteroids/asteroid_01.png", Vec2(0.5, 0.5), randPos, 1 , 0.5f);
 		string asteroidSprites[4] = { "Asteroids/asteroid_01.png","Asteroids/asteroid_02.png","Asteroids/asteroid_03.png","Asteroids/asteroid_04.png" };
 		Animate* animateAsteroids = CAnimation::createAnimation(asteroidSprites, 4, 81, 101, 0.5f);
 		asteroid1->runAction(RepeatForever::create(animateAsteroids));
