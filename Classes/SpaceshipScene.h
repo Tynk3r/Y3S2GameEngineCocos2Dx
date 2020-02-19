@@ -53,6 +53,8 @@ private:
 	int playerHealthPacks = 1;
 	char text[256];
 
+	int numOfHealthpacks;
+
 public:
     Node* spriteNode;
 
@@ -72,6 +74,8 @@ public:
     GameObject* FetchGO(cocos2d::Node* node_, GameObject::GAMEOBJECT_TYPE type);
 
     void RespawnPlayer();
+	void UseHealthpack();
+
     // implement the "static create()" method manually
     CREATE_FUNC(SpaceshipScene);
 };

@@ -13,6 +13,7 @@ struct GameObject
 		GO_PLAYER,
 		GO_BULLET,
 		GO_ENEMY,
+		GO_HEALTHPACK,
 		GO_TOTAL, //must be last
 	};
 	GAMEOBJECT_TYPE type;
