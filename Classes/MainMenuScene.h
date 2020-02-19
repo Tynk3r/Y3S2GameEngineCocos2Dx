@@ -47,6 +47,7 @@ public:
 	void SliderEventSetPercent(Ref * sender, ui::Slider::EventType type);
 	void ButtonEventChangeScene(Ref * sender, ui::Button::TouchEventType type);
 	void ButtonEventShopScene(Ref * sender, ui::Button::TouchEventType type);
+	void Tweet(Ref* sender, ui::Button::TouchEventType type);
 	void CheckBoxEventMuteSound(Ref * sender, ui::CheckBox::EventType type);
     
     // implement the "static create()" method manually
