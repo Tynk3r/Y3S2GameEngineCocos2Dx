@@ -199,7 +199,7 @@ bool SpaceshipScene::init()
 	BG->setPosition(Vec2(visibleSize.width * .5f, visibleSize.height * .5f));
 	BG->setName("BackGround");
 	BG->setScale(visibleSize.width / BG->getContentSize().width, visibleSize.height / BG->getContentSize().height);
-	this->addChild(BG, 1);
+	//this->addChild(BG, 1);
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -229,6 +229,7 @@ bool SpaceshipScene::init()
 	sprite->setPosition3D(spritePos);
 	this->addChild(sprite);
 
+	hud->setVisible(false);
 	//// New camera(User2)
 	//camera2 = Camera::createPerspective(60, (float)visibleSize.width / visibleSize.height, 1.0, 1000);
 	////camera2->setCameraFlag(CameraFlag::USER2);
