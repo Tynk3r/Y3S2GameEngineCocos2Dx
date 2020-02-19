@@ -13,6 +13,8 @@ struct GameObject
 		GO_ASTEROID,
 		GO_PLAYER,
 		GO_BULLET,
+		GO_MISSILE,
+		GO_EXPLOSION,
 		GO_ENEMY,
 		GO_HEALTHPACK,
 		GO_TOTAL, //must be last
@@ -25,6 +27,7 @@ struct GameObject
 	StateMachine* sm;
 	int health;
 	int maxHealth;
+	float lifetime;
 	cocos2d::ui::LoadingBar* healthBarNode;
 
 	GameObject(cocos2d::Node* node_, GAMEOBJECT_TYPE typeValue = GO_ASTEROID);

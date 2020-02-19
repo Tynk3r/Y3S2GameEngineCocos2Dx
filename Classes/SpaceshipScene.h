@@ -36,6 +36,13 @@ using namespace cocos2d;
 
 class SpaceshipScene : public cocos2d::Scene
 {
+
+	enum WEAPONS
+	{
+		W_BLASTER,
+		W_ROCKETS
+	};
+
 private:
 	GLProgram* proPostProcess;
 	RenderTexture* rendtex;
@@ -54,7 +61,7 @@ private:
 	char text[256];
 
 	int numOfHealthpacks;
-
+	WEAPONS currentWeapon;
 public:
     Node* spriteNode;
 

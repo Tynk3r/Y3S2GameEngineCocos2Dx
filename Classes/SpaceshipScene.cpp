@@ -287,6 +287,7 @@ bool SpaceshipScene::init()
 	numOfAsteroids = 3;
 	numOfEnemies = 1;
 	numOfHealthpacks = 0;
+	currentWeapon = W_ROCKETS;
 	return true;
 }
 
@@ -310,15 +311,34 @@ void SpaceshipScene::ShootButtonEvent(Ref* sender, cocos2d::ui::Button::TouchEve
 	case cocos2d::ui::Widget::TouchEventType::MOVED:
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		tempDir = Vec2(sin(CC_DEGREES_TO_RADIANS(player->node->getRotation())), cos(CC_DEGREES_TO_RADIANS(player->node->getRotation())));
-		tempDir.normalize();
-		bullet = Nodes::CreateNodeUsingTextureCache(spriteNode, "bullet", "Bullet.png", Vec2(0.5, 0.5), player->node->getPosition() + tempDir * 85.f, 1, 0.01f);
-		physicsBody = PhysicsBody::createBox(Size(bullet->getContentSize().width, bullet->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
-		physicsBody->setDynamic(true);
-		physicsBody->setMass(0.01);
-		physicsBody->setVelocity(tempDir * BULLET_SPEED);
-		bullet->addComponent(physicsBody);
-		FetchGO(bullet, GameObject::GO_BULLET);
+
+		switch (currentWeapon)
+		{
+		case W_BLASTER:
+			tempDir = Vec2(sin(CC_DEGREES_TO_RADIANS(player->node->getRotation())), cos(CC_DEGREES_TO_RADIANS(player->node->getRotation())));
+			tempDir.normalize();
+			bullet = Nodes::CreateNodeUsingTextureCache(spriteNode, "bullet", "Bullet.png", Vec2(0.5, 0.5), player->node->getPosition() + tempDir * 85.f, 1, 0.01f);
+			physicsBody = PhysicsBody::createBox(Size(bullet->getContentSize().width, bullet->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
+			physicsBody->setDynamic(true);
+			physicsBody->setMass(0.01);
+			physicsBody->setVelocity(tempDir * BULLET_SPEED);
+			bullet->addComponent(physicsBody);
+			FetchGO(bullet, GameObject::GO_BULLET);
+			break;
+
+		case W_ROCKETS:
+			tempDir = Vec2(sin(CC_DEGREES_TO_RADIANS(player->node->getRotation())), cos(CC_DEGREES_TO_RADIANS(player->node->getRotation())));
+			tempDir.normalize();
+			bullet = Nodes::CreateNodeUsingTextureCache(spriteNode, "missile", "missile.png", Vec2(0.5, 0.5), player->node->getPosition() + tempDir * 85.f, 1, 0.01f);
+			physicsBody = PhysicsBody::createBox(Size(bullet->getContentSize().width, bullet->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
+			physicsBody->setDynamic(true);
+			physicsBody->setMass(1);
+			physicsBody->setVelocity(tempDir * BULLET_SPEED);
+			bullet->addComponent(physicsBody);
+			FetchGO(bullet, GameObject::GO_MISSILE);
+			break;
+		}
+
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
 		break;
@@ -329,6 +349,7 @@ void SpaceshipScene::ShootButtonEvent(Ref* sender, cocos2d::ui::Button::TouchEve
 
 void SpaceshipScene::Update(float interval)
 {
+	
 	auto spaceship = this->getChildByName("spriteNode")->getChildByName("mainSprite");
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -444,6 +465,21 @@ void SpaceshipScene::Update(float interval)
 		}
 	}
 
+	for (auto go : m_goList)
+	{
+		if (go->active)
+		{
+			if (go->lifetime != -100)
+			{
+				go->lifetime -= interval;
+				if (go->lifetime <= 0)
+				{
+					go->active = false;
+				}
+			}
+		}
+	}
+
 	//Collision Checks
 	for (auto go : m_goList)
 	{
@@ -459,7 +495,7 @@ void SpaceshipScene::Update(float interval)
 				{
 					if (go->type == GameObject::GO_BULLET)
 					{
-						if (go2->type == GameObject::GO_BULLET)
+						if (go2->type == GameObject::GO_BULLET || go2->type == GameObject::GO_MISSILE)
 						{
 							go->active = false;
 							go2->active = false;
@@ -468,7 +504,9 @@ void SpaceshipScene::Update(float interval)
 						if (go2->type == GameObject::GO_ASTEROID || go2->type == GameObject::GO_ENEMY || go2->type == GameObject::GO_PLAYER)
 						{
 							go->active = false;
+
 							go2->health--;
+
 							auto HealthBar = static_cast<cocos2d::ui::LoadingBar*>(go2->node->getChildByName("HealthBar"));
 							HealthBar->setPercent((100.0f / go2->maxHealth) * go2->health);
 							if (go2->health <= 0)
@@ -511,6 +549,66 @@ void SpaceshipScene::Update(float interval)
 							go2->active = false;
 							numOfHealthpacks++;
 							continue;
+						}
+					}
+
+					else if (go->type == GameObject::GO_MISSILE)
+					{
+						if (go2->type == GameObject::GO_BULLET || go2->type == GameObject::GO_MISSILE)
+						{
+							go->active = false;
+							go2->active = false;
+							continue;
+						}
+						if (go2->type == GameObject::GO_ASTEROID || go2->type == GameObject::GO_ENEMY || go2->type == GameObject::GO_PLAYER)
+						{
+							go->active = false;
+							auto explosion = Nodes::CreateNodeUsingTextureCache(spriteNode, "explosion", "explosion.png", Vec2(0.5, 0.5), go2->node->getPosition(), 1, 0.5f);
+							auto physicsBody = PhysicsBody::createBox(Size(explosion->getContentSize().width, explosion->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
+							physicsBody->setDynamic(true);
+							physicsBody->setVelocityLimit(SPEED_LIMIT);
+							physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
+							explosion->addComponent(physicsBody);
+							GameObject* explode = FetchGO(explosion, GameObject::GO_EXPLOSION);
+							explode->lifetime = 0.1f;
+						}
+					}
+					else if (go->type == GameObject::GO_EXPLOSION)
+					{
+
+						if (go2->type == GameObject::GO_ASTEROID || go2->type == GameObject::GO_ENEMY || go2->type == GameObject::GO_PLAYER)
+						{
+							go->active = false;
+							go2->health -= 10;
+							auto HealthBar = static_cast<cocos2d::ui::LoadingBar*>(go2->node->getChildByName("HealthBar"));
+							HealthBar->setPercent((100.0f / go2->maxHealth) * go2->health);
+							if (go2->health <= 0)
+							{
+								go2->active = false;
+								if (go2->type == GameObject::GO_ENEMY)
+								{
+									points += 10;
+									sprintf(text, "Points: %d", points);
+									auto pointsText = static_cast<cocos2d::Label*>(hud->getChildByName("pointCount"));
+									pointsText->setString(text);
+									numOfEnemies--;
+								}
+								if (go2->type == GameObject::GO_ASTEROID)
+								{
+									points += 2;
+									sprintf(text, "Points: %d", points);
+									auto pointsText = static_cast<cocos2d::Label*>(hud->getChildByName("pointCount"));
+									pointsText->setString(text);
+									numOfAsteroids--;
+								}
+								if (go2->type == GameObject::GO_PLAYER)
+								{
+									points -= 25;
+									sprintf(text, "Points: %d", points);
+									auto pointsText = static_cast<cocos2d::Label*>(hud->getChildByName("pointCount"));
+									pointsText->setString(text);
+								}
+							}
 						}
 					}
 				}
