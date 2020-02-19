@@ -118,7 +118,7 @@ bool SpaceshipScene::init()
 	hud->joyStick->Inactive();
 	auto ShootButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.75, visibleSize.height * 0.25f), "Shoot", this);
 	ShootButton->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::ShootButtonEvent, this));
-	hud->addChild(ShootButton);
+	//hud->addChild(ShootButton);
 
 	//Create sprites
 	auto MainSpriteNode = Nodes::CreateNodeUsingTextureCache(spriteNode, "mainSprite", "Spaceship.png", Vec2(0.5, 0.5), Vec2(visibleSize.width * .5f, visibleSize.height * .5f), 1, 0.1f);
@@ -159,7 +159,7 @@ bool SpaceshipScene::init()
 	BG->setPosition(Vec2(visibleSize.width * .5f, visibleSize.height * .5f));
 	BG->setName("BackGround");
 	BG->setScale(visibleSize.width / BG->getContentSize().width, visibleSize.height / BG->getContentSize().height);
-	this->addChild(BG, 1);
+	//this->addChild(BG, 1);
 
 
 	auto sprite = Sprite::create("HelloWorld.png");
@@ -170,7 +170,7 @@ bool SpaceshipScene::init()
 	////this is the layer, when adding camera to it, all its children will be affect only when you set the second parameter to true	this->setCameraMask((unsigned short)CameraFlag::USER2, true);
 	//this->setCameraMask((unsigned short)CameraFlag::DEFAULT, true);
 	//// add the sprite as a child to this layer
-	this->addChild(sprite);
+	//this->addChild(sprite);
 
 
 	//auto deCam = Camera::getDefaultCamera();
@@ -251,7 +251,7 @@ bool SpaceshipScene::init()
 	enemySpawnTime = ENEMY_SPAWN_TIME;
 	numOfAsteroids = 3;
 	numOfEnemies = 1;
-
+	numOfHealthpacks = 0;
 	return true;
 }
 
@@ -434,8 +434,8 @@ void SpaceshipScene::Update(float interval)
 						{
 							go->active = false;
 							go2->health--;
-							auto HealthBar = static_cast<cocos2d::ui::LoadingBar*>(go2->node->getChildByName("HealthBar"));
-							HealthBar->setPercent((100.0f / go2->maxHealth) * go2->health);
+							//auto HealthBar = static_cast<cocos2d::ui::LoadingBar*>(go2->node->getChildByName("HealthBar"));
+							//HealthBar->setPercent((100.0f / go2->maxHealth) * go2->health);
 							if (go2->health <= 0)
 							{
 								go2->active = false;
@@ -453,6 +453,17 @@ void SpaceshipScene::Update(float interval)
 									points -= 25;
 							}
 
+							continue;
+						}
+					}
+
+					//player collsion
+					else if (go->type == GameObject::GO_PLAYER)
+					{
+						if (go2->type == GameObject::GO_HEALTHPACK)
+						{
+							go2->active = false;
+							numOfHealthpacks++;
 							continue;
 						}
 					}
@@ -539,10 +550,10 @@ GameObject* SpaceshipScene::FetchGO(cocos2d::Node* node_, GameObject::GAMEOBJECT
 			go->node = node_;
 			if (go->type != go->GO_BULLET)
 			{
-				auto HealthBar = UI::createLoadingBar("LoadingBarFile.png", cocos2d::ui::LoadingBar::Direction::RIGHT, go->node->getPosition() - Vec2(go->node->getContentSize().width / 7, 0) + Vec2(0, go->node->getContentSize().height / 1.5), this);
-				HealthBar->setPercent((100.0f / go->maxHealth)*go->health);
-				HealthBar->setScale(1);
-				go->node->addChild(HealthBar, 1, "HealthBar");
+				//auto HealthBar = UI::createLoadingBar("LoadingBarFile.png", cocos2d::ui::LoadingBar::Direction::RIGHT, go->node->getPosition() - Vec2(go->node->getContentSize().width / 7, 0) + Vec2(0, go->node->getContentSize().height / 1.5), this);
+				//HealthBar->setPercent((100.0f / go->maxHealth)*go->health);
+				//HealthBar->setScale(1);
+				//go->node->addChild(HealthBar, 1, "HealthBar");
 
 			}
 			return go;
@@ -576,4 +587,12 @@ void SpaceshipScene::RespawnPlayer()
 	player = FetchGO(MainSpriteNode, GameObject::GO_PLAYER);
 	player->health = 20;
 	player->maxHealth = 20;
+}
+
+void SpaceshipScene::UseHealthpack()
+{
+	if (player->health < player->maxHealth)
+	{
+		player->health = player->maxHealth;
+	}
 }
