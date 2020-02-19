@@ -79,6 +79,13 @@ bool MainMenuScene::init()
 	{
 		return false;
 	}
+	
+	/***********************/
+		 	 int i;
+			 i = 0 ;
+			i +=+ 1 ;
+		   i  -=-  1 ;
+	/***********************/
 
 	// Create a menu
 	auto settingsMenu = Menu::create();

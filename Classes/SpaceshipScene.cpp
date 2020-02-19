@@ -120,17 +120,22 @@ bool SpaceshipScene::init()
 	// Creation of player HUD
 	hud = HUDLayer::create();
 	hud->addJoystickToLayer();
-	hud->joyStick->Inactive();
 
 	auto ShootButton = UI::createButton("Shoot.png", "ShootPressed.png", "ShootPressed.png", Vec2(visibleSize.width * 0.85, visibleSize.height * 0.15f), "", this);
 	ShootButton->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::ShootButtonEvent, this));
-	ShootButton->setScale(0.5);
+	ShootButton->setScale(0.5f);
 	hud->addChild(ShootButton);
 
 	auto HealthPackButton = UI::createButton("HealthPack.png", "HealthPackPressed.png", "HealthPackDisabled.png", Vec2(visibleSize.width * 0.85, visibleSize.height * 0.3f), "", this);
 	HealthPackButton->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::UseHealthpack, this));
 	HealthPackButton->setScale(0.1f);
 	hud->addChild(HealthPackButton, 1, "HealthPackButton");
+
+	auto SwapWeapon = UI::createButton("SwapButton.png", "SwapButtonPressed.png", "HealthPackDisabled.png", Vec2(visibleSize.width * 0.75, visibleSize.height * 0.3f), "", this);
+	SwapWeapon->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::SwapWeapon, this));
+	SwapWeapon->setScale(0.3f);
+	hud->addChild(SwapWeapon, 1, "SwapWeaponButton");
+
 
 	sprintf(text, "X %d", playerHealthPacks);
 	auto HealthPackCount = UI::createTTFLabel(text, Vec2(visibleSize.width * 0.9, visibleSize.height * 0.3f), "fonts/MarkerFelt.ttf", 24, 1, this);
@@ -185,11 +190,11 @@ bool SpaceshipScene::init()
 	temp->health = 10;
 	temp->maxHealth = 10;
 
-	auto thrusters = Nodes::CreateNodeUsingTextureCache(spriteNode, "thrusters", "ThrusterSprites/Thruster1.png", Vec2(0.5, 0.5), MainSpriteNode->getPosition(), 1, 0.1f);
-	string thrusterSprites[5] = { "ThrusterSprites/Thruster1.png","ThrusterSprites/Thruster2.png","ThrusterSprites/Thruster3.png","ThrusterSprites/Thruster4.png","ThrusterSprites/Thruster5.png" };
-	Animate* animateThrusters = CAnimation::createAnimation(thrusterSprites, 5, thrusters->getContentSize().width, thrusters->getContentSize().height, 0.5f);
-	thrusters->runAction(RepeatForever::create(animateThrusters));
-	player->node->addChild(thrusters);
+	//auto thrusters = Nodes::CreateNodeUsingTextureCache(spriteNode, "thrusters", "ThrusterSprites/Thruster1.png", Vec2(0.5, 0.5), MainSpriteNode->getPosition(), 1, 0.1f);
+	//string thrusterSprites[5] = { "ThrusterSprites/Thruster1.png","ThrusterSprites/Thruster2.png","ThrusterSprites/Thruster3.png","ThrusterSprites/Thruster4.png","ThrusterSprites/Thruster5.png" };
+	//Animate* animateThrusters = CAnimation::createAnimation(thrusterSprites, 5, thrusters->getContentSize().width, thrusters->getContentSize().height, 0.5f);
+	//thrusters->runAction(RepeatForever::create(animateThrusters));
+	//player->node->addChild(thrusters);
 
 	Texture2D* BGtexture = Director::getInstance()->getTextureCache()->addImage("SpaceTexture.png");
 	Rect rect = Rect::ZERO;
@@ -199,7 +204,7 @@ bool SpaceshipScene::init()
 	BG->setPosition(Vec2(visibleSize.width * .5f, visibleSize.height * .5f));
 	BG->setName("BackGround");
 	BG->setScale(visibleSize.width / BG->getContentSize().width, visibleSize.height / BG->getContentSize().height);
-	//this->addChild(BG, 1);
+	this->addChild(BG, 1);
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -229,7 +234,7 @@ bool SpaceshipScene::init()
 	sprite->setPosition3D(spritePos);
 	this->addChild(sprite);
 
-	hud->setVisible(false);
+	//hud->setVisible(true);
 	//// New camera(User2)
 	//camera2 = Camera::createPerspective(60, (float)visibleSize.width / visibleSize.height, 1.0, 1000);
 	////camera2->setCameraFlag(CameraFlag::USER2);
@@ -249,6 +254,7 @@ bool SpaceshipScene::init()
 	////this->getDefaultCamera()->setVisible(true);
 	//camera2->setVisible(true);
 	//camera3->setVisible(true);
+
 
 	//Add containers to scene
 	this->addChild(spriteNode, 1);
@@ -861,6 +867,7 @@ void SpaceshipScene::RespawnPlayer(Ref* sender, cocos2d::ui::Button::TouchEventT
 		player->maxHealth = 20;
 		HealthBar = static_cast<cocos2d::ui::LoadingBar*>(player->node->getChildByName("HealthBar"));
 		HealthBar->setPercent((100.0f / player->maxHealth) * player->health);
+		HealthBar->setPosition(Vec2(player->node->getContentSize().width / 4.0f, 0));
 		deathScreen->setVisible(false);
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:

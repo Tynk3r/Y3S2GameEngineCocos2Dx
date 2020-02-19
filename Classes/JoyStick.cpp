@@ -36,6 +36,9 @@ JoyStick::JoyStick(std::string backGroundFile, std::string joyStickFile, float s
 	joyStickSP->setName("JoyStick");
 	joyStickSP->setScale(scale);
 
+	backGroundSP->setVisible(false);
+	joyStickSP->setVisible(false);
+
 	radius = backGroundSP->getContentSize().width * 0.3f;
 }
 
