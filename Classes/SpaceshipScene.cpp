@@ -149,11 +149,13 @@ bool SpaceshipScene::init()
 	DeadScreensprite->setScale(visibleSize.width / DeadScreensprite->getContentSize().width, visibleSize.height / DeadScreensprite->getContentSize().height);
 	deathScreen->addChild(DeadScreensprite);
 
-	auto BackToMainMenuButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.5, visibleSize.height * 0.15), "Back To MainMenu", this);
+	auto BackToMainMenuButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Blue_Front1.png", Vec2(visibleSize.width * 0.5, visibleSize.height * 0.15), "Back To MainMenu", this);
+	BackToMainMenuButton->setTitleFontSize(10);
 	BackToMainMenuButton->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::BackToMainMenu, this));
 	deathScreen->addChild(BackToMainMenuButton);
 
-	auto RespawnButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Button_Disable.png", Vec2(visibleSize.width * 0.5, visibleSize.height * 0.35), "Try Again?", this);
+	auto RespawnButton = UI::createButton("Button_Normal.png", "Button_Press.png", "Blue_Front1.png", Vec2(visibleSize.width * 0.5, visibleSize.height * 0.35), "Try Again?", this);
+	BackToMainMenuButton->setTitleFontSize(10);
 	RespawnButton->addTouchEventListener(CC_CALLBACK_2(SpaceshipScene::RespawnPlayer, this));
 	deathScreen->addChild(RespawnButton);
 	deathScreen->setVisible(false);
@@ -222,35 +224,30 @@ bool SpaceshipScene::init()
 	}
 
 	auto sprite = Sprite::create("HelloWorld.png");
-	auto spritePos = Vec3(visibleSize.width / 2 + origin.x,
-		visibleSize.height / 2 + origin.y,
-		0);
+	auto spritePos = Vec3(visibleSize.width / 2 + origin.x,visibleSize.height / 2 + origin.y,0);
+	sprite->setCameraMask((unsigned short)CameraFlag::USER2);
+	sprite->setPosition3D(spritePos);
+	this->addChild(sprite);
 
-	//// position the sprite on the center of the screen
-	//sprite->setPosition3D(spritePos);
-	////this is the layer, when adding camera to it, all its children will be affect only when you set the second parameter to true
-	//this->setCameraMask((unsigned short)CameraFlag::USER2, true);
-	//// add the sprite as a child to this layer
-	//this->addChild(sprite);
-
-	// New camera(User2)
-	camera2 = Camera::createPerspective(60, (float)visibleSize.width / visibleSize.height, 1.0, 1000);
-	camera2->setCameraFlag(CameraFlag::USER2);
-	camera2->setPosition3D(spritePos + Vec3(0, 0, 800));
-	camera2->lookAt(spritePos, Vec3(0.0, 1.0, 0.0));
-	this->addChild(camera2);
-	camera2->setVisible(true);
-
-	camera3 = Camera::createPerspective(60, (float)visibleSize.width / visibleSize.height, 1.0, 1000);
-	camera3->setCameraFlag(CameraFlag::USER3);
-	camera3->setPosition3D(spritePos + Vec3(0, 0, 800));
-	camera3->lookAt(spritePos, Vec3(0.0, 1.0, 0.0));
-	this->addChild(camera3);
-	camera3->setVisible(true);
-
-
-	spriteNode->setCameraMask((unsigned short)CameraFlag::USER2);
-	nodeItems->setCameraMask((unsigned short)CameraFlag::USER3);
+	//// New camera(User2)
+	//camera2 = Camera::createPerspective(60, (float)visibleSize.width / visibleSize.height, 1.0, 1000);
+	////camera2->setCameraFlag(CameraFlag::USER2);
+	//camera2->setPosition3D(spritePos + Vec3(0, 0, 600));
+	//camera2->lookAt(spritePos, Vec3(0.0, 1.0, 0.0));
+	//this->addChild(camera2);
+	//
+	//camera3 = Camera::createPerspective(60, (float)visibleSize.width / visibleSize.height, 1.0, 1000);
+	////camera3->setCameraFlag(CameraFlag::USER3);
+	//camera3->setPosition3D(spritePos + Vec3(0, 0, 600));
+	//camera3->lookAt(spritePos, Vec3(0.0, 1.0, 0.0));
+	//this->addChild(camera3);
+	//
+	////spriteNode->setCameraMask((unsigned short)CameraFlag::USER2);
+	////nodeItems->setCameraMask((unsigned short)CameraFlag::USER3);
+	//
+	////this->getDefaultCamera()->setVisible(true);
+	//camera2->setVisible(true);
+	//camera3->setVisible(true);
 
 	//Add containers to scene
 	this->addChild(spriteNode, 1);
