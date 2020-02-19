@@ -48,11 +48,11 @@ private:
     int points;
     float asteroidSpawnTime;
     float enemySpawnTime;
+    float healthPackSpawnTime;
     int numOfAsteroids;
     int numOfEnemies;
 	int playerHealthPacks = 1;
 	char text[256];
-
 	int numOfHealthpacks;
 
 public:

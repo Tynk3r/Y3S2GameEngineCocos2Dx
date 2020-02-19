@@ -29,8 +29,10 @@
 #define BULLET_SPEED 300.f
 #define MAX_ASTEROIDS 5
 #define MAX_ENEMIES 3
+#define MAX_HEALTHPACKS 3
 #define ASTEROID_SPAWN_TIME 5
 #define ENEMY_SPAWN_TIME 15
+#define HEALTH_PACK_SPAWN_TIME 7
 #define OBJECTS_DISTANCE_FROM_PLAYER 250
 
 #include "SpaceshipScene.h"
@@ -231,7 +233,7 @@ bool SpaceshipScene::init()
 	
 		//Create static PhysicsBody
 		physicsBody = PhysicsBody::createBox(Size(asteroid1->getContentSize().width, asteroid1->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
-		physicsBody->setDynamic(true);
+		physicsBody->setDynamic(false);
 		physicsBody->setVelocityLimit(SPEED_LIMIT);
 		physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
 		asteroid1->addComponent(physicsBody);
@@ -284,6 +286,7 @@ bool SpaceshipScene::init()
 	points = 0;
 	asteroidSpawnTime = ASTEROID_SPAWN_TIME;
 	enemySpawnTime = ENEMY_SPAWN_TIME;
+	healthPackSpawnTime = HEALTH_PACK_SPAWN_TIME;
 	numOfAsteroids = 3;
 	numOfEnemies = 1;
 	numOfHealthpacks = 0;
@@ -502,14 +505,18 @@ void SpaceshipScene::Update(float interval)
 							continue;
 						}
 					}
-
 					//player collsion
 					else if (go->type == GameObject::GO_PLAYER)
 					{
 						if (go2->type == GameObject::GO_HEALTHPACK)
 						{
+							playerHealthPacks++;
+
+							sprintf(text, "X %d", playerHealthPacks);
+							auto HealthPackCount = static_cast<cocos2d::Label*>(hud->getChildByName("PlayerHealthPackCount"));
+							HealthPackCount->setString(text);
+
 							go2->active = false;
-							numOfHealthpacks++;
 							continue;
 						}
 					}
@@ -536,7 +543,9 @@ void SpaceshipScene::Update(float interval)
 		asteroidSpawnTime -= interval;
 	if (numOfEnemies < MAX_ENEMIES)
 		enemySpawnTime -= interval;
-	if (asteroidSpawnTime <= 0)
+	if (numOfHealthpacks < MAX_HEALTHPACKS)
+		healthPackSpawnTime -= interval;
+	if (asteroidSpawnTime <= 0 && player->active)
 	{
 		asteroidSpawnTime = ASTEROID_SPAWN_TIME;
 		Vec2 randPos = Vec2(cocos2d::RandomHelper::random_real(0.f, visibleSize.width), cocos2d::RandomHelper::random_real(0.f, visibleSize.height));
@@ -549,9 +558,10 @@ void SpaceshipScene::Update(float interval)
 
 		//Create static PhysicsBody
 		PhysicsBody* physicsBody = PhysicsBody::createBox(Size(asteroid1->getContentSize().width, asteroid1->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
-		physicsBody->setDynamic(true);
+		physicsBody->setDynamic(false);
 		physicsBody->setVelocityLimit(SPEED_LIMIT);
 		physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
+		physicsBody->setVelocity(Vec2(0, 0));
 		asteroid1->addComponent(physicsBody);
 
 		GameObject* temp = FetchGO(asteroid1, GameObject::GO_ASTEROID);
@@ -559,7 +569,7 @@ void SpaceshipScene::Update(float interval)
 		temp->maxHealth = 5;
 		numOfAsteroids++;
 	}
-	if (enemySpawnTime <= 0)
+	if (enemySpawnTime <= 0 && player->active)
 	{
 		enemySpawnTime = ENEMY_SPAWN_TIME;
 		Vec2 randPos = Vec2(cocos2d::RandomHelper::random_real(0.f, visibleSize.width), cocos2d::RandomHelper::random_real(0.f, visibleSize.height));
@@ -570,11 +580,28 @@ void SpaceshipScene::Update(float interval)
 		physicsBody->setDynamic(true);
 		physicsBody->setVelocityLimit(SPEED_LIMIT);
 		physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
+		physicsBody->setVelocity(Vec2(0, 0));
 		EnemySprite->addComponent(physicsBody);
 		GameObject* temp = FetchGO(EnemySprite, GameObject::GO_ENEMY);
 		temp->health = 10;
 		temp->maxHealth = 10;
 		numOfEnemies++;
+	}
+	if (healthPackSpawnTime <= 0 && player->active)
+	{
+		healthPackSpawnTime = HEALTH_PACK_SPAWN_TIME;
+		Vec2 randPos = Vec2(cocos2d::RandomHelper::random_real(0.f, visibleSize.width), cocos2d::RandomHelper::random_real(0.f, visibleSize.height));
+		while ((player->node->getPosition() - randPos).length() < OBJECTS_DISTANCE_FROM_PLAYER)
+			randPos = Vec2(cocos2d::RandomHelper::random_real(0.f, visibleSize.width), cocos2d::RandomHelper::random_real(0.f, visibleSize.height));
+		auto HealthPackSprite = Nodes::CreateNodeUsingTextureCache(spriteNode, "healthPack", "HealthPack.png", Vec2(0.5, 0.5), randPos, 1, 0.1f);
+		PhysicsBody* physicsBody = PhysicsBody::createBox(Size(HealthPackSprite->getContentSize().width, HealthPackSprite->getContentSize().height), PhysicsMaterial(0.001f, 0.1f, 5.0f));
+		physicsBody->setDynamic(true);
+		physicsBody->setVelocityLimit(SPEED_LIMIT);
+		physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
+		physicsBody->setVelocity(Vec2(0, 0));
+		HealthPackSprite->addComponent(physicsBody);
+		GameObject* temp = FetchGO(HealthPackSprite, GameObject::GO_HEALTHPACK);
+		numOfHealthpacks++;
 	}
 
 	// Post Processing
@@ -661,6 +688,7 @@ void SpaceshipScene::RespawnPlayer(Ref* sender, cocos2d::ui::Button::TouchEventT
 		physicsBody->setDynamic(true);
 		physicsBody->setVelocityLimit(SPEED_LIMIT);
 		physicsBody->setAngularVelocityLimit(SPIN_SPEED_LIMIT);
+		physicsBody->setVelocity(Vec2(0, 0));
 		MainSpriteNode->addComponent(physicsBody);
 		player = FetchGO(MainSpriteNode, GameObject::GO_PLAYER);
 		player->health = 20;
